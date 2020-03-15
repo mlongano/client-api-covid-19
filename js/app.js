@@ -65,23 +65,9 @@ function drawChart () {
             terapia_intensivaTable.addRows( terapia_intensiva );
             decedutiTable.addRows( deceduti );
 
-            var optionsOld = {
-                width: 600,
-                height: 300,
-                hAxis: { minValue: first, maxValue:  last},
-                vAxis: { minValue: 0, maxValue: 4 },
-                chartArea: { width: '50%' },
-                trendlines: {
-                    0: {
-                        type: 'linear',
-                        showR2: true,
-                        visibleInLegend: true
-                    }
-                }
-            };
             var chartOptions = {
                 title: 'Nessuno',
-                width: 450,
+                width: 800,
                 height: 500,
                 chartArea: { width: '50%' },
 
