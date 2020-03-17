@@ -22,7 +22,9 @@ function extractInfo(json) {
     let deceduti = [];
     let first = new Date( json[ 0 ].data ).getTime() / 86400000 - 18316;
     let last = first;
+    let lastDateTime;
     for ( daily of json ) {
+        lastDateTime = daily.data;
         let date = daily.data.split( " " )[ 0 ];
         console.log( date );
         let ratio = daily.nuovi_attualmente_positivi / previous;
@@ -36,6 +38,7 @@ function extractInfo(json) {
         deceduti.push( [ last, daily.deceduti ] );
     }
     return {
+        date: lastDateTime,
         ratios: ratios,
         totale_casi: totale_casi,
         nuovi_attualmente_positivi: nuovi_attualmente_positivi,
@@ -59,6 +62,11 @@ function drawChart () {
         .then( json => {
             let dataTag;
             let data = extractInfo( json );
+
+            let header = document.querySelector( 'header.header' );
+            let titleH1 = document.createElement( 'h1' );
+            titleH1.textContent = `Ultimo aggiornamento ${data.date}`
+            header.appendChild( titleH1 );
 
             var chartOptions = {
                 title: 'Nessuno',
