@@ -2,6 +2,9 @@
 google.charts.load( 'current', { 'packages': [ 'corechart', 'line' ] } );
 
 google.charts.setOnLoadCallback( drawChart );
+google.charts.setOnLoadCallback( drawTrentino);
+
+
 const getData = () => {
     //return fetch( "https://coronavirus-tracker-api.herokuapp.com/all" );
     return fetch( "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json" );
@@ -63,8 +66,8 @@ function drawChart () {
             let dataTag;
             let data = extractInfo( json );
 
-            let header = document.querySelector( 'header.header' );
-            let titleH1 = document.createElement( 'h1' );
+            let header = document.querySelector( '#head-nazionali' );
+            let titleH1 = document.createElement( 'h2' );
             titleH1.textContent = `Ultimo aggiornamento ${data.date}`
             header.appendChild( titleH1 );
 
@@ -143,4 +146,53 @@ function drawChart () {
 
 
         } );
+}
+
+function drawTrentino () {
+    fetch( window.location.origin + "/cov19-trentino.json" ).then( ( response ) => {
+        response.json().then( json => {
+            let list = [];
+            for ( day of json ) {
+                let date = new Date( day.date );
+                let data = day.cov19_data;
+                data.shift();
+                let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
+                list.push( [ date, total ] );
+                console.log( date, total );
+            }
+            let table = new google.visualization.DataTable();
+            table.addColumn( 'date', 'Data' );
+            table.addColumn( 'number', 'Casi positivi' );
+            table.addRows( list );
+            var chartOptions = {
+                title: 'Nessuno',
+                width: 800,
+                height: 500,
+                chartArea: { width: '50%' },
+
+                hAxis: {
+                    title: 'Date'
+                },
+                vAxis: {
+                    title: 'Ratio',
+                    ticks: [ 0, 200, 400, 600, 800, 1000 ]
+                },
+                trendlines: {
+                    0: {
+                        type: 'linear',
+                        showR2: true,
+                        visibleInLegend: true
+                    }
+                }
+
+            };
+
+            dataTag = 'trentino'
+            draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
+                fillDatesTable( dataTag, list), dataTag, chartOptions );
+
+
+        });
+    });
+
 }
