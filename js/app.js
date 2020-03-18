@@ -174,7 +174,7 @@ function drawTrentino () {
                     title: 'Date'
                 },
                 vAxis: {
-                    title: 'Ratio',
+                    title: 'Positivi',
                     ticks: [ 0, 200, 400, 600, 800, 1000 ]
                 },
                 trendlines: {
