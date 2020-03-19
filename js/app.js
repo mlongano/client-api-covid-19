@@ -23,8 +23,10 @@ function extractInfo(json) {
     let nuovi_attualmente_positivi = [];
     let terapia_intensiva = [];
     let deceduti = [];
+    let nuovi_deceduti = [];
     let first = new Date( json[ 0 ].data ).getTime() / 86400000 - 18316;
     let last = first;
+    let lastDeceduti = 0;
     let lastDateTime;
     for ( daily of json ) {
         lastDateTime = daily.data;
@@ -39,6 +41,8 @@ function extractInfo(json) {
         nuovi_attualmente_positivi.push( [ last, daily.nuovi_attualmente_positivi ] );
         terapia_intensiva.push( [ last, daily.terapia_intensiva ] );
         deceduti.push( [ last, daily.deceduti ] );
+        nuovi_deceduti.push( [ last, daily.deceduti - lastDeceduti ] );
+        lastDeceduti = daily.deceduti;
     }
     return {
         date: lastDateTime,
@@ -46,7 +50,8 @@ function extractInfo(json) {
         totale_casi: totale_casi,
         nuovi_attualmente_positivi: nuovi_attualmente_positivi,
         terapia_intensiva: terapia_intensiva,
-        deceduti: deceduti
+        deceduti: deceduti,
+        nuovi_deceduti: nuovi_deceduti
     }
 
 }
@@ -67,8 +72,9 @@ function drawChart () {
             let data = extractInfo( json );
 
             let header = document.querySelector( '#head-nazionali' );
-            let titleH1 = document.createElement( 'h2' );
-            titleH1.textContent = `Ultimo aggiornamento ${data.date}`
+            let titleH1 = document.createElement( 'p' );
+            titleH1.textContent = `Ultimo aggiornamento ${data.date}`;
+            titleH1.className = "lead";
             header.appendChild( titleH1 );
 
             var chartOptions = {
@@ -144,6 +150,15 @@ function drawChart () {
             dataTag = 'deceduti';
             draw( "Deceduti", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
 
+            chartOptions.vAxis = {
+                title: 'Deceduti',
+                scaleType: 'lin',
+                ticks: [ 0, 250, 500, 750, 1000 ]
+            };
+
+            dataTag = 'nuovi_deceduti';
+            draw( "Nuovi deceduti", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
+
 
         } );
 }
@@ -152,18 +167,34 @@ function drawTrentino () {
     fetch( window.location.origin + "/cov19-trentino.json" ).then( ( response ) => {
         response.json().then( json => {
             let list = [];
+            let dailyList = [];
+            let ratioList = [];
+            let before = 0;
+            let data = json[ 0 ].cov19_data;
+            data = Array.from( data );
+            data.shift();
+            let beforeDaily = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
+            let date;
             for ( day of json ) {
-                let date = new Date( day.date );
-                let data = day.cov19_data;
+                date = new Date( day.date );
+                data = day.cov19_data;
                 data.shift();
                 let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
+                let daily = total - before;
+                let ratio = daily / beforeDaily;
+                beforeDaily = daily;
+                before = total;
                 list.push( [ date, total ] );
+                dailyList.push( [ date, daily ] );
+                ratioList.push( [ date, ratio ] );
                 console.log( date, total );
             }
-            let table = new google.visualization.DataTable();
-            table.addColumn( 'date', 'Data' );
-            table.addColumn( 'number', 'Casi positivi' );
-            table.addRows( list );
+            let header = document.querySelector( '#head-trentino' );
+            let titleH1 = document.createElement( 'p' );
+            titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split("T")[0]} ${date.toLocaleTimeString()}`;
+            titleH1.className = "lead";
+            header.appendChild( titleH1 );
+
             var chartOptions = {
                 title: 'Nessuno',
                 width: 800,
@@ -190,6 +221,27 @@ function drawTrentino () {
             dataTag = 'trentino'
             draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
                 fillDatesTable( dataTag, list), dataTag, chartOptions );
+
+            chartOptions.vAxis = {
+                title: 'Positivi',
+                scaleType: 'lin',
+                ticks: [ 0, 50, 100, 150, 200 ]
+            };
+
+            dataTag = 'nuovi_trentino'
+            draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
+                fillDatesTable( dataTag, dailyList ), dataTag, chartOptions );
+
+            chartOptions.vAxis = {
+                title: 'Positivi',
+                scaleType: 'lin',
+                ticks: [ 0, 0.5, 1, 1.5, 2 ]
+            };
+
+            dataTag = 'trentino_ratio'
+            draw( "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
+                fillDatesTable( dataTag, ratioList ), dataTag, chartOptions );
+
 
 
         });
