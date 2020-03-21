@@ -1,8 +1,16 @@
+const dataTrentino = {
+    urlelencocomuni: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoP79r_KG6CSuIF6Woik3c8o54B_K8EPDYgI_zpPehuYydjNztNzLAPqGwpAoHn6uGLE2_J7zy1Lwa/pub?gid=1484863998&single=true&output=csv',
+    urlandamentocasi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=0&single=true&output=csv',
+    urlstatoclinico: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=1231542924&single=true&output=csv',
+    urlcodicicomuni: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=1576237135&single=true&output=csv",
+    urlsituazionecomuni: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoP79r_KG6CSuIF6Woik3c8o54B_K8EPDYgI_zpPehuYydjNztNzLAPqGwpAoHn6uGLE2_J7zy1Lwa/pub?gid=1484863998&single=true&output=csv'
+};
+
 //google.charts.load( 'current', { 'packages': [ 'corechart' ] } );
 google.charts.load( 'current', { 'packages': [ 'corechart', 'line' ] } );
 
 google.charts.setOnLoadCallback( drawChart );
-google.charts.setOnLoadCallback( drawTrentino);
+google.charts.setOnLoadCallback( drawChartTrentino);
 
 
 const getData = () => {
@@ -31,10 +39,10 @@ function extractInfo(json) {
     for ( daily of json ) {
         lastDateTime = daily.data;
         let date = daily.data.split( " " )[ 0 ];
-        console.log( date );
+        //console.log( date );
         let ratio = daily.nuovi_attualmente_positivi / previous;
         previous = daily.nuovi_attualmente_positivi;
-        console.log( daily );
+        //console.log( daily );
         last = new Date( date );
         ratios.push( [ last, ratio ] );
         totale_casi.push( [ last, daily.totale_casi ] );
@@ -163,7 +171,7 @@ function drawChart () {
         } );
 }
 
-function drawTrentino () {
+function drawChartTrentinoOld () {
     fetch( window.location.origin + "/cov19-trentino.json" ).then( ( response ) => {
         response.json().then( json => {
             let list = [];
@@ -187,7 +195,7 @@ function drawTrentino () {
                 list.push( [ date, total ] );
                 dailyList.push( [ date, daily ] );
                 ratioList.push( [ date, ratio ] );
-                console.log( date, total );
+                //console.log( date, total );
             }
             let header = document.querySelector( '#head-trentino' );
             let titleH1 = document.createElement( 'p' );
@@ -210,17 +218,19 @@ function drawTrentino () {
                 },
                 trendlines: {
                     0: {
-                        type: 'linear',
+                        type: 'exponential',
                         showR2: true,
                         visibleInLegend: true
                     }
                 }
 
             };
+            chartOptions.trendlines[ 0 ].type = 'exponential';
 
             dataTag = 'trentino'
             draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
                 fillDatesTable( dataTag, list), dataTag, chartOptions );
+            chartOptions.trendlines[ 0 ].type = 'exponential';
 
             chartOptions.vAxis = {
                 title: 'Positivi',
@@ -237,6 +247,7 @@ function drawTrentino () {
                 scaleType: 'lin',
                 ticks: [ 0, 0.5, 1, 1.5, 2 ]
             };
+            chartOptions.trendlines[ 0 ].type = 'linear';
 
             dataTag = 'trentino_ratio'
             draw( "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
@@ -247,4 +258,80 @@ function drawTrentino () {
         });
     });
 
+}
+
+async function drawChartTrentino () {
+    let res = await fetch( dataTrentino.urlandamentocasi );
+    let csvString = await res.text();
+    const json = await csv().fromString( csvString );
+    console.log( json );
+    let list = [];
+    let dailyList = [];
+    let ratioList = [];
+
+    let date;
+    let beforeDaily = json[ 0 ].day;
+    for ( day of json ) {
+        date = new Date( day.data.split( "/" ).reverse().join( "-" ) );
+        let daily = parseInt(day.day);
+        let ratio = daily / beforeDaily;
+        beforeDaily = daily;
+        list.push( [ date, parseInt( day.cumulete ) ] );
+        dailyList.push( [ date, daily ] );
+        ratioList.push( [ date, ratio ] );
+        console.log( date, parseInt( day.cumulete )  );
+    }
+    let header = document.querySelector( '#head-trentino' );
+    let titleH1 = document.createElement( 'p' );
+    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]}`;
+    titleH1.className = "lead";
+    header.appendChild( titleH1 );
+
+    var chartOptions = {
+        title: 'Nessuno',
+        width: 800,
+        height: 500,
+        chartArea: { width: '50%' },
+
+        hAxis: {
+            title: 'Date'
+        },
+        vAxis: {
+            title: 'Positivi',
+            ticks: [ 0, 200, 400, 600, 800, 1000 ]
+        },
+        trendlines: {
+            0: {
+                type: 'exponential',
+                showR2: true,
+                visibleInLegend: true
+            }
+        }
+
+    };
+
+    dataTag = 'trentino'
+    draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
+        fillDatesTable( dataTag, list ), dataTag, chartOptions );
+
+    chartOptions.vAxis = {
+        title: 'Positivi',
+        scaleType: 'lin',
+        ticks: [ 0, 50, 100, 150, 200 ]
+    };
+
+    dataTag = 'nuovi_trentino'
+    draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
+        fillDatesTable( dataTag, dailyList ), dataTag, chartOptions );
+
+    chartOptions.vAxis = {
+        title: 'Positivi',
+        scaleType: 'lin',
+        ticks: [ 0, 0.5, 1, 1.5, 2 ]
+    };
+    chartOptions.trendlines[ 0 ].type = 'linear';
+
+    dataTag = 'trentino_ratio'
+    draw( "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
+        fillDatesTable( dataTag, ratioList ), dataTag, chartOptions );
 }
