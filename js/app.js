@@ -9,7 +9,7 @@ const dataTrentino = {
 //google.charts.load( 'current', { 'packages': [ 'corechart' ] } );
 google.charts.load( 'current', { 'packages': [ 'corechart', 'line' ] } );
 
-google.charts.setOnLoadCallback( drawChart );
+google.charts.setOnLoadCallback( drawChartItaly );
 google.charts.setOnLoadCallback( drawChartTrentino);
 
 
@@ -72,7 +72,7 @@ function fillDatesTable(title, list) {
     return table;
 }
 
-function drawChart () {
+function drawChartItaly () {
     getData()
         .then( res => res.json() )
         .then( json => {
@@ -96,7 +96,7 @@ function drawChart () {
                 },
                 vAxis: {
                     title: 'Ratio',
-                    ticks: [ 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4 ]
+                    // ticks: [ 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4 ]
                 },
                 trendlines: {
                     0: {
@@ -117,7 +117,7 @@ function drawChart () {
             chartOptions.vAxis = {
                 title: 'Positivi',
                 scaleType: 'lin',
-                ticks: [ 0, 5000, 10000, 15000, 20000, 25000]
+                //ticks: [ 0, 5000, 10000, 15000, 20000, 25000]
             };
 
             dataTag = 'totale_casi';
@@ -127,7 +127,7 @@ function drawChart () {
             chartOptions.vAxis = {
                 title: 'Positivi',
                 scaleType: 'lin',
-                ticks: [ 0, 1000, 2000, 3000 ]
+                //ticks: [ 0, 1000, 2000, 3000 ]
             };
 
             dataTag = 'nuovi_attualmente_positivi';
@@ -139,7 +139,7 @@ function drawChart () {
             chartOptions.vAxis = {
                 title: 'In terapia intensiva',
                 scaleType: 'lin',
-                ticks: [ 0, 1000, 2000, 3000 ]
+                //ticks: [ 0, 1000, 2000, 3000 ]
             };
 
             dataTag = 'terapia_intensiva';
@@ -152,7 +152,7 @@ function drawChart () {
             chartOptions.vAxis = {
                 title: 'Deceduti',
                 scaleType: 'lin',
-                ticks: [ 0, 1000, 2000, 3000 ]
+                //ticks: [ 0, 1000, 2000, 3000 ]
             };
 
             dataTag = 'deceduti';
@@ -161,7 +161,7 @@ function drawChart () {
             chartOptions.vAxis = {
                 title: 'Deceduti',
                 scaleType: 'lin',
-                ticks: [ 0, 250, 500, 750, 1000 ]
+                //ticks: [ 0, 250, 500, 750, 1000 ]
             };
 
             dataTag = 'nuovi_deceduti';
@@ -298,7 +298,7 @@ async function drawChartTrentino () {
         },
         vAxis: {
             title: 'Positivi',
-            ticks: [ 0, 200, 400, 600, 800, 1000 ]
+            //ticks: [ 0, 200, 400, 600, 800, 1000 ]
         },
         trendlines: {
             0: {
@@ -317,7 +317,7 @@ async function drawChartTrentino () {
     chartOptions.vAxis = {
         title: 'Positivi',
         scaleType: 'lin',
-        ticks: [ 0, 50, 100, 150, 200 ]
+        //ticks: [ 0, 50, 100, 150, 200 ]
     };
 
     dataTag = 'nuovi_trentino'
@@ -327,7 +327,7 @@ async function drawChartTrentino () {
     chartOptions.vAxis = {
         title: 'Positivi',
         scaleType: 'lin',
-        ticks: [ 0, 0.5, 1, 1.5, 2 ]
+        //ticks: [ 0, 0.5, 1, 1.5, 2 ]
     };
     chartOptions.trendlines[ 0 ].type = 'linear';
 
