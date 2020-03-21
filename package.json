@@ -6,6 +6,9 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "csv-string": "^3.1.8",
+    "csvtojson": "^2.0.10",
+    "jsdom": "^16.2.1",
+    "node-fetch": "^2.6.0",
     "request": "^2.88.2"
   },
   "devDependencies": {},
