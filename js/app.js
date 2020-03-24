@@ -167,30 +167,42 @@ async function drawChartItaly () {
 function drawChartTrentinoOld () {
     fetch( window.location.origin + "/cov19-trentino.json" ).then( ( response ) => {
         response.json().then( json => {
+            const COMUNE = "ROVERETO";
             let list = [];
             let dailyList = [];
             let ratioList = [];
+            let casesList = [];
             let before = 0;
             let data = json[ 0 ].cov19_data;
             data = Array.from( data );
             data.shift();
             let beforeDaily = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
             let date;
+            let idx;
             for ( day of json ) {
                 date = new Date( day.date );
                 data = day.cov19_data;
+                if ( data[ 0 ][ 0 ] === "Lat" ) {
+                    idx = 3;
+                } else {
+                    idx = 1;
+                }
+                let cases = data.filter((row) => {
+                    return row[ idx - 1 ] === COMUNE;
+                })
                 data.shift();
                 let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
-                let daily = total - before;
+                let comune = data.filter((s) )
+                let daily = cases - before;
                 let ratio = daily / beforeDaily;
                 beforeDaily = daily;
-                before = total;
-                list.push( [ date, total ] );
+                before = cases;
+                casesList.push( [ date, cases ] );
                 dailyList.push( [ date, daily ] );
                 ratioList.push( [ date, ratio ] );
                 //console.log( date, total );
             }
-            let header = document.querySelector( '#head-trentino' );
+            let header = document.querySelector( '#head-comune' );
             let titleH1 = document.createElement( 'p' );
             titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]} ${date.toLocaleTimeString()}`;
             titleH1.className = "lead";
