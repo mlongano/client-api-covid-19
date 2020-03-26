@@ -14,11 +14,14 @@ google.charts.load( 'current', { 'packages': [ 'corechart', 'line' ] } );
 
 google.charts.setOnLoadCallback( drawChartItaly );
 google.charts.setOnLoadCallback( drawChartTrentino );
+google.charts.setOnLoadCallback( drawChartComuni );
 
 function draw ( title, data, element, options ) {
     options.title = title;
-    var chart = new google.visualization.LineChart( document.getElementById( element ) );
+    const chartMaterial = new google.charts.Line( document.getElementById( element ) );
+    const chart = new google.visualization.LineChart( document.getElementById( element ) );
     chart.draw( data, options );
+    //chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
 }
 
 function extractInfo ( json ) {
@@ -164,105 +167,92 @@ async function drawChartItaly () {
 
 }
 
-function drawChartComuni () {
-    fetch( window.location.origin + "/cov19-trentino.json" ).then( ( response ) => {
-        response.json().then( json => {
-            const COMUNE = "ROVERETO";
-            let list = [];
-            let dailyList = [];
-            let ratioList = [];
-            let casesList = [];
-            let before = 0;
-            let data = json[ 0 ].cov19_data;
-            data = Array.from( data );
-            data.shift();
-            let beforeDaily = 1;
-            let date;
-            let idx;
-            for ( day of json ) {
-                date = new Date( day.date );
-                data = day.cov19_data;
-                if ( data[ 0 ][ 0 ] === "Lat" ) {
-                    idx = 3;
-                } else {
-                    idx = 1;
-                }
-                let cases = data.filter((row) => {
-                    return row[ idx - 1 ] === COMUNE;
-                })
-                data.shift();
-                let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
-                // let comune = data.filter(  )
-                let daily = cases - before;
-                let ratio = daily / beforeDaily;
-                beforeDaily = daily;
-                before = cases;
-                casesList.push( [ date, cases ] );
-                dailyList.push( [ date, daily ] );
-                ratioList.push( [ date, ratio ] );
-                //console.log( date, total );
+async function drawChartComuni () {
+    let res = await fetch( window.location.origin + "/cov19-trentino.json" );
+    let json = await res.json();
+    const COMUNE = "ROVERETO";
+    let dailyList = [];
+    let ratioList = [];
+    let casesList = [];
+    let before = 0;
+    let data = json[ 0 ].cov19_data;
+    data = Array.from( data );
+    data.shift();
+    let beforeDaily = 1;
+    let date;
+    let idx;
+    for ( day of json ) {
+        date = new Date( day.date );
+        data = day.cov19_data;
+        if ( data[ 0 ][ 0 ] === "Lat" ) {
+            idx = 3;
+        } else {
+            idx = 1;
+        }
+        //console.log(idx);
+        let cases = data.filter( ( row ) => {
+            return row[ idx - 1 ] === COMUNE;
+        } )[ 0 ];
+        data.shift();
+        let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
+        let comune = parseInt( cases[ idx ] );
+        let daily = comune - before;
+        let ratio = daily / beforeDaily;
+        console.log( COMUNE, date, ratio, daily, beforeDaily );
+
+        beforeDaily = daily;
+        before = comune;
+        casesList.push( [ date, comune ] );
+        dailyList.push( [ date, daily ] );
+        ratioList.push( [ date, ratio ] );
+        //console.log( date, total );
+    }
+    let header = document.querySelector( '#head-comune' );
+    let title = document.querySelector( '#head-comune > h1' );
+    title.textContent += COMUNE;
+    let titleH1 = document.createElement( 'p' );
+    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]} ${date.toLocaleTimeString()}`;
+    titleH1.className = "lead";
+    header.appendChild( titleH1 );
+
+    var chartOptions = {
+        title: 'Nessuno',
+        width: 800,
+        height: 500,
+        chartArea: { width: '50%' },
+
+        hAxis: {
+            title: 'Date'
+        },
+        vAxis: {
+            title: 'Positivi',
+            //ticks: [ 0, 200, 400, 600, 800, 1000 ]
+        },
+        trendlines: {
+            0: {
+                type: 'exponential',
+                showR2: true,
+                visibleInLegend: true
             }
-            let header = document.querySelector( '#head-comune' );
-            let titleH1 = document.createElement( 'p' );
-            titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]} ${date.toLocaleTimeString()}`;
-            titleH1.className = "lead";
-            header.appendChild( titleH1 );
+        }
 
-            var chartOptions = {
-                title: 'Nessuno',
-                width: 800,
-                height: 500,
-                chartArea: { width: '50%' },
+    };
+    chartOptions.trendlines[ 0 ].type = 'exponential';
 
-                hAxis: {
-                    title: 'Date'
-                },
-                vAxis: {
-                    title: 'Positivi',
-                    ticks: [ 0, 200, 400, 600, 800, 1000 ]
-                },
-                trendlines: {
-                    0: {
-                        type: 'exponential',
-                        showR2: true,
-                        visibleInLegend: true
-                    }
-                }
+    dataTag = 'comuni'
+    draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
+        fillDatesTable( dataTag, casesList ), dataTag, chartOptions );
+    chartOptions.trendlines[ 0 ].type = 'exponential';
 
-            };
-            chartOptions.trendlines[ 0 ].type = 'exponential';
+    chartOptions.vAxis = {
+        title: 'Positivi',
+        scaleType: 'lin',
+        //ticks: [ 0, 50, 100, 150, 200 ]
+    };
 
-            dataTag = 'trentino'
-            draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
-                fillDatesTable( dataTag, list ), dataTag, chartOptions );
-            chartOptions.trendlines[ 0 ].type = 'exponential';
-
-            chartOptions.vAxis = {
-                title: 'Positivi',
-                scaleType: 'lin',
-                ticks: [ 0, 50, 100, 150, 200 ]
-            };
-
-            dataTag = 'nuovi_trentino'
-            draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
-                fillDatesTable( dataTag, dailyList ), dataTag, chartOptions );
-
-            chartOptions.vAxis = {
-                title: 'Positivi',
-                scaleType: 'lin',
-                ticks: [ 0, 0.5, 1, 1.5, 2 ]
-            };
-            chartOptions.trendlines[ 0 ].type = 'linear';
-
-            dataTag = 'trentino_ratio'
-            draw( "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
-                fillDatesTable( dataTag, ratioList ), dataTag, chartOptions );
-
-
-
-        } );
-    } );
-
+    dataTag = 'nuovi_comuni'
+    draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
+        fillDatesTable( dataTag, dailyList ), dataTag, chartOptions );
 }
 
 async function drawChartTrentino () {
