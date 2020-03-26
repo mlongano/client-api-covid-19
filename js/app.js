@@ -164,7 +164,7 @@ async function drawChartItaly () {
 
 }
 
-function drawChartTrentinoOld () {
+function drawChartComuni () {
     fetch( window.location.origin + "/cov19-trentino.json" ).then( ( response ) => {
         response.json().then( json => {
             const COMUNE = "ROVERETO";
@@ -176,7 +176,7 @@ function drawChartTrentinoOld () {
             let data = json[ 0 ].cov19_data;
             data = Array.from( data );
             data.shift();
-            let beforeDaily = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
+            let beforeDaily = 1;
             let date;
             let idx;
             for ( day of json ) {
@@ -192,7 +192,7 @@ function drawChartTrentinoOld () {
                 })
                 data.shift();
                 let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
-                let comune = data.filter((s) )
+                // let comune = data.filter(  )
                 let daily = cases - before;
                 let ratio = daily / beforeDaily;
                 beforeDaily = daily;
