@@ -1,9 +1,9 @@
 const urlsDataTrentino = {
-    urlelencocomuni: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoP79r_KG6CSuIF6Woik3c8o54B_K8EPDYgI_zpPehuYydjNztNzLAPqGwpAoHn6uGLE2_J7zy1Lwa/pub?gid=1484863998&single=true&output=csv',
-    urlandamentocasi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=0&single=true&output=csv',
-    urlstatoclinico: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=1231542924&single=true&output=csv',
-    urlcodicicomuni: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=1576237135&single=true&output=csv",
-    urlsituazionecomuni: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoP79r_KG6CSuIF6Woik3c8o54B_K8EPDYgI_zpPehuYydjNztNzLAPqGwpAoHn6uGLE2_J7zy1Lwa/pub?gid=1484863998&single=true&output=csv'
+    urlelencocomuni: 'https://covid19trentino.fbk.eu/data/codici_comuni.csv',
+    //urlandamentocasi: 'https://covid19trentino.fbk.eu//spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=0&single=true&output=csv',
+    urlstatoclinico: 'https://covid19trentino.fbk.eu/data/stato_clinico_td.csv',
+    urlcodicicomuni: "https://covid19trentino.fbk.eu/data/codici_comuni.csv",
+    urlsituazionecomuni: 'https://covid19trentino.fbk.eu/data/stato_comuni_td.csv'
 };
 
 //return fetch( "https://coronavirus-tracker-api.herokuapp.com/all" );
@@ -174,11 +174,14 @@ async function drawChartComuni () {
     let dailyList = [];
     let ratioList = [];
     let casesList = [];
+    let deadsList = [];
+    let deadsDailyList = [];
     let before = 0;
     let data = json[ 0 ].cov19_data;
     data = Array.from( data );
     data.shift();
     let beforeDaily = 1;
+    let deads = 0;
     let date;
     let idx;
     for ( day of json ) {
@@ -186,6 +189,8 @@ async function drawChartComuni () {
         data = day.cov19_data;
         if ( data[ 0 ][ 0 ] === "Lat" ) {
             idx = 3;
+        } else if ( data[ 0 ][ 0 ] === "codice") {
+            idx = 2;
         } else {
             idx = 1;
         }
@@ -199,7 +204,12 @@ async function drawChartComuni () {
         let daily = comune - before;
         let ratio = daily / beforeDaily;
         console.log( COMUNE, date, ratio, daily, beforeDaily );
-
+        if ( idx === 2 ) {
+            let last = cases[ idx + 2 ];
+            deadsList.push( [ date, parseInt( last ) ] );
+            deadsDailyList.push( [ date, parseInt( last - deads ) ] );
+            deads = last;
+        }
         beforeDaily = daily;
         before = comune;
         casesList.push( [ date, comune ] );
@@ -253,51 +263,55 @@ async function drawChartComuni () {
     dataTag = 'nuovi_comuni'
     draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
         fillDatesTable( dataTag, dailyList ), dataTag, chartOptions );
+
+    chartOptions.colors = [ '#c21212' ];
+    chartOptions.vAxis = {
+        title: 'Deceduti',
+        scaleType: 'lin',
+    };
+
+
+    dataTag = 'comuni_deceduti'
+    draw( "Deceduti. Dati ricavati da quelli pubblicati dall'APSS",
+        fillDatesTable( dataTag, deadsList ), dataTag, chartOptions );
+
+    dataTag = 'comuni_nuovi_deceduti'
+    draw( "Nuovi deceduti. Dati ricavati da quelli pubblicati dall'APSS",
+        fillDatesTable( dataTag, deadsDailyList ), dataTag, chartOptions );
 }
 
 async function drawChartTrentino () {
-    let res = await fetch( urlsDataTrentino.urlandamentocasi );
+    //let res = await fetch( urlsDataTrentino.urlandamentocasi );
+    //let csvString = await res.text();
+    //const json = await csv().fromString( csvString );
+    //console.log( json );
+    let res = await fetch( urlsDataTrentino.urlstatoclinico );
     let csvString = await res.text();
     const json = await csv().fromString( csvString );
-    //console.log( json );
-    res = await fetch( urlsDataTrentino.urlstatoclinico );
-    csvString = await res.text();
-    const statoJson = await csv().fromString( csvString );
-    console.log( statoJson );
+    console.log( json );
     let totaleList = [];
     let nuoviList = [];
     let ratioList = [];
     let decedutiList = [];
     let decedutiNuoviList = [];
-
+    let beforeDaily = Infinity;
     let date;
-    let beforeDaily = json[ 0 ].day;
+    let deceduti = 0;
+    //let beforeDaily = json[ 0 ].day;
     for ( day of json ) {
-        date = new Date( day.data.split( "/" ).reverse().join( "-" ) );
-        let daily = parseInt( day.day );
+        date = new Date( day.giorno.split( "/" ).reverse().join( "-" ) );
+        let daily = parseInt( day.incremento );
         let ratio = daily / beforeDaily;
         beforeDaily = daily;
-        totaleList.push( [ date, parseInt( day.cumulete ) ] );
+        totaleList.push( [ date, parseInt( day.totale_pos ) ] );
         nuoviList.push( [ date, daily ] );
         ratioList.push( [ date, ratio ] );
-        console.log( date, parseInt( day.cumulete ) );
+        decedutiList.push( [ date, parseInt( day.deceduti ) ] );
+        decedutiNuoviList.push( [ date, parseInt( day.deceduti ) - deceduti ] );
+        deceduti = parseInt( day.deceduti );
+        console.log( date, parseInt( day.totale_pos ) );
     }
-    beforeDaily = statoJson[ 4 ];
-    let deceduti = statoJson[ 4 ];
-    delete deceduti.field1;
-    for ( const [ key, value ] of Object.entries( deceduti ) ) {
-        //console.log( key.split( "/" ).reverse().join( "/" ));
-        decedutiList.push( [
-            new Date( key.split( "/" ).reverse().join( "/" ) ), parseInt( value )
-        ] );
-    }
-    console.log( "deceduti", decedutiList );
-    beforeDaily = decedutiList[ 0 ][ 1 ];
-    decedutiNuoviList = decedutiList.map( d => {
-        const nuovi = d[ 1 ] - beforeDaily;
-        beforeDaily = nuovi;
-        return [ d[ 0 ], nuovi ];
-    } )
+
     console.log( "nuovi dec.", decedutiNuoviList );
 
     let header = document.querySelector( '#head-trentino' );

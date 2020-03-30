@@ -18,12 +18,10 @@ const oldLinks = [
     'https://datawrapper.dwcdn.net/oyFMH/1/'  // 18 marzo 2020 ore 12:00
 ];
 
-const dataTrentino = {
-    urlelencocomuni: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoP79r_KG6CSuIF6Woik3c8o54B_K8EPDYgI_zpPehuYydjNztNzLAPqGwpAoHn6uGLE2_J7zy1Lwa/pub?gid=1484863998&single=true&output=csv',
-    urlandamentocasi: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=0&single=true&output=csv',
-    urlstatoclinico: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=1231542924&single=true&output=csv',
-    urlcodicicomuni: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQdZ7yQhx38EsaR05DRprb0YkaRf5eK6cfrrOGMfFnDKq-P-g8q-HMRv76UnTkoRYvCMrgkQkX-xJOE/pub?gid=1576237135&single=true&output=csv",
-    urlsituazionecomuni: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoP79r_KG6CSuIF6Woik3c8o54B_K8EPDYgI_zpPehuYydjNztNzLAPqGwpAoHn6uGLE2_J7zy1Lwa/pub?gid=1484863998&single=true&output=csv'
+const urlsDataTrentino = {
+    urlsituazionecomuni: 'https://covid19trentino.fbk.eu/data/stato_comuni_td.csv',
+    urlstatoclinico: 'https://covid19trentino.fbk.eu/data/stato_clinico_td.csv',
+    urlysituazionecomuni: 'https://covid19trentino.fbk.eu/data/yesterday/stato_comuni_td.csv'
 };
 
 function getLatestData () {
@@ -61,7 +59,7 @@ function getData ( link ) {
         // date = date.replace( 'ore ', '' );
         let date = $( 'oggi' ).children[ 0 ].data;
         date = new Date( date );
-        console.log(`Date: ${date}`);
+        console.log( `Date: ${date}` );
 
         saveJson( linksPath, { date: date, url: link } );
 
@@ -140,33 +138,30 @@ async function getNewData () {
     const dataPath = 'cov19-trentino.json'
     const linksPath = 'cov19-trentino-links.json'
 
-    let res = await fetch( dataTrentino.urlandamentocasi );
+    let res = await fetch( urlsDataTrentino.urlstatoclinico );
     let csvString = await res.text();
     let jsonAndamento = await csv().fromString( csvString );
-    let lastDateStr = jsonAndamento[ jsonAndamento.length - 1 ].data;
+    let lastDateStr = jsonAndamento[ jsonAndamento.length - 1 ].giorno;
     let lastDate = new Date( lastDateStr.split( "/" ).reverse().join( "-" ) );
-    let lastConfirmed = parseInt( jsonAndamento[ jsonAndamento.length - 1 ].cumulete );
+    let lastConfirmed = parseInt( jsonAndamento[ jsonAndamento.length - 1 ].totale_pos );
 
     console.log( lastDate, lastConfirmed );
 
 
-    res = await fetch( dataTrentino.urlsituazionecomuni );
+    res = await fetch( urlsDataTrentino.urlsituazionecomuni );
     csvString = await res.text();
     //let json = await csv().fromString( csvString );
     let json = CSV.parse( csvString, "," );
-    console.log(json);
+    console.log( json );
 
     //let total = json.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 'NR CASI' ] ), 0 );
     let total = json.reduce( ( accumulator, currentValue ) => {
-        let n = parseInt( currentValue[ 1 ] );
-        return accumulator + (n ? n : 0);
+        let n = parseInt( currentValue[ 2 ] );
+        return accumulator + ( n ? n : 0 );
     }, 0 );
     console.log( total );
-    if ( lastConfirmed == total ) {
-        saveJson( linksPath, { date: lastDate, url: dataTrentino.urlsituazionecomuni } );
-        saveJson( dataPath, { date: lastDate, url: dataTrentino.urlsituazionecomuni, cov19_data: json } );
-    }
-
+    saveJson( linksPath, { date: lastDate, url: urlsDataTrentino.urlsituazionecomuni } );
+    saveJson( dataPath, { date: lastDate, url: urlsDataTrentino.urlsituazionecomuni, cov19_data: json } );
 }
 
 
