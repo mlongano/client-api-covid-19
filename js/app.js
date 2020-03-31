@@ -45,7 +45,17 @@ function extractInfo ( json ) {
         //console.log( daily );
         last = new Date( date );
         ratios.push( [ last, ratio ] );
-        totale_casi.push( [ last, daily.totale_casi ] );
+        let tc = 0;
+        if ( daily.totale_casi === "") {
+            
+        }
+        if (daily.totale_casi instanceof String) {
+            tc = parseInt( daily.totale_casi );
+        } else {
+            tc = daily.totale_casi;
+        };
+
+        totale_casi.push( [ last, tc ] );
         nuovi_attualmente_positivi.push( [ last, daily.nuovi_attualmente_positivi ] );
         terapia_intensiva.push( [ last, daily.terapia_intensiva ] );
         deceduti.push( [ last, daily.deceduti ] );
