@@ -20,34 +20,39 @@ function draw ( title, data, element, options ) {
     options.title = title;
     const chartMaterial = new google.charts.Line( document.getElementById( element ) );
     const chart = new google.visualization.LineChart( document.getElementById( element ) );
-    chart.draw( data, options );
-    //chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
+    //chart.draw( data, options );
+    chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
 }
 
 function extractInfo ( json ) {
-    let previous = json[ 0 ].nuovi_attualmente_positivi;
+    console.log("Italia json:", json);
+    let previous = json[ 0 ].nuovi_positivi;
     let ratios = [];
     let totale_casi = [];
-    let nuovi_attualmente_positivi = [];
+    let nuovi_positivi = [];
     let terapia_intensiva = [];
     let deceduti = [];
-    let nuovi_deceduti = [];
+    let tamponi = [];
+    let ospedalizzati = [];
     let first = new Date( json[ 0 ].data ).getTime() / 86400000 - 18316;
     let last = first;
-    let lastDeceduti = 0;
+    let ultimiDeceduti = 0;
+    let ultimiTamponi = 0;
+    let ultimiTerapia = 0;
+    let ultimiOspedalizzati = 0;
     let lastDateTime;
     for ( daily of json ) {
         lastDateTime = daily.data;
         let date = daily.data.split( " " )[ 0 ];
         //console.log( date );
-        let ratio = daily.nuovi_attualmente_positivi / previous;
-        previous = daily.nuovi_attualmente_positivi;
+        let ratio = daily.nuovi_positivi / previous;
+        previous = daily.nuovi_positivi;
         //console.log( daily );
         last = new Date( date );
         ratios.push( [ last, ratio ] );
         let tc = 0;
         if ( daily.totale_casi === "") {
-            
+
         }
         if (daily.totale_casi instanceof String) {
             tc = parseInt( daily.totale_casi );
@@ -56,28 +61,40 @@ function extractInfo ( json ) {
         };
 
         totale_casi.push( [ last, tc ] );
-        nuovi_attualmente_positivi.push( [ last, daily.nuovi_attualmente_positivi ] );
-        terapia_intensiva.push( [ last, daily.terapia_intensiva ] );
-        deceduti.push( [ last, daily.deceduti ] );
-        nuovi_deceduti.push( [ last, daily.deceduti - lastDeceduti ] );
-        lastDeceduti = daily.deceduti;
+        nuovi_positivi.push( [ last, daily.nuovi_positivi ] );
+
+        ospedalizzati.push( [ last, daily.totale_ospedalizzati - ultimiOspedalizzati, daily.totale_ospedalizzati ] );
+        ultimiOspedalizzati = daily.totale_ospedalizzati;
+
+        terapia_intensiva.push( [ last, daily.terapia_intensiva - ultimiTerapia, daily.terapia_intensiva  ]);
+        ultimiTerapia = daily.terapia_intensiva;
+
+        deceduti.push( [ last, daily.deceduti - ultimiDeceduti, daily.deceduti  ] );
+        ultimiDeceduti = daily.deceduti;
+
+        tamponi.push( [ last, daily.tamponi - ultimiTamponi, daily.tamponi ] );
+        ultimiTamponi = daily.tamponi;
     }
+    console.log( "Italia deceduti:", deceduti);
     return {
         date: lastDateTime,
         ratios: ratios,
         totale_casi: totale_casi,
-        nuovi_attualmente_positivi: nuovi_attualmente_positivi,
+        nuovi_positivi: nuovi_positivi,
         terapia_intensiva: terapia_intensiva,
         deceduti: deceduti,
-        nuovi_deceduti: nuovi_deceduti
+        tamponi: tamponi,
+        ospedalizzati: ospedalizzati,
     }
 
 }
 
-function fillDatesTable ( title, list ) {
+function fillDatesTable ( title, list, ncol=1 ) {
     let table = new google.visualization.DataTable();
     table.addColumn( 'date', 'Data' );
-    table.addColumn( 'number', title );
+    for ( let n = 0; n < ncol; n++ ) {
+        table.addColumn( 'number', title );
+    }
     table.addRows( list );
     return table;
 }
@@ -93,8 +110,7 @@ async function drawChartItaly () {
     titleH1.className = "lead";
     header.appendChild( titleH1 );
 
-    var chartOptions = {
-        title: 'Nessuno',
+    const chartOptions = {
         width: 800,
         height: 500,
         chartArea: { width: '50%' },
@@ -102,85 +118,156 @@ async function drawChartItaly () {
         hAxis: {
             title: 'Date'
         },
-        vAxis: {
-            title: 'Ratio',
-            // ticks: [ 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4 ]
-        },
-        trendlines: {
-            0: {
-                type: 'linear',
-                showR2: true,
-                visibleInLegend: true
-            }
+    };
+
+    chartOptions.colors = [ '#0012F2', '#F012F2' ];
+
+    chartOptions.series = {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: { axis: 'nuovi' },
+        1: { axis: 'totale' }
+    };
+    chartOptions.axes = {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+            nuovi: { label: 'Nuovi' },
+            totale: { label: 'Totale' }
         }
+    }
+    chartOptions.legend = { position: 'none' }
 
-    };
+    dataTag = 'ospedalizzati';
+    draw( "Ospedalizzati", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
 
-    dataTag = 'ratio'
-    draw( "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
-        fillDatesTable( dataTag, data[ 'ratios' ] ), dataTag, chartOptions );
-
-    chartOptions.trendlines[ 0 ].type = 'exponential';
-    chartOptions.colors = [ '#6F9654' ];
-    chartOptions.vAxis = {
-        title: 'Positivi',
-        scaleType: 'lin',
-        //ticks: [ 0, 5000, 10000, 15000, 20000, 25000]
-    };
-
-    dataTag = 'totale_casi';
-    draw( "Totale dei casi", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
-
-    chartOptions.colors = [ '#6F0654' ];
-    chartOptions.vAxis = {
-        title: 'Positivi',
-        scaleType: 'lin',
-        //ticks: [ 0, 1000, 2000, 3000 ]
-    };
-
-    dataTag = 'nuovi_attualmente_positivi';
-    draw( "Nuovi positivi", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
-
-    // options.title = "In terapia intensiva";
-    // draw( terapia_intensiva, 'terapia_intensiva', options );
-    chartOptions.colors = [ '#6F5694' ];
-    chartOptions.vAxis = {
-        title: 'In terapia intensiva',
-        scaleType: 'lin',
-        //ticks: [ 0, 1000, 2000, 3000 ]
-    };
+    chartOptions.colors = [ '#6F5694', '#FF5694'  ];
 
     dataTag = 'terapia_intensiva';
-    draw( "In terapia intensiva", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
+    draw( "In terapia intensiva", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
 
-    // options.title = "Deceduti";
-    // options.colors = [ '#c21212' ];
-    // draw( deceduti, 'deceduti', options );
-    chartOptions.colors = [ '#c21212' ];
-    chartOptions.vAxis = {
-        title: 'Deceduti',
-        scaleType: 'lin',
-        //ticks: [ 0, 1000, 2000, 3000 ]
-    };
+    chartOptions.colors = [ '#c21212',  '#c28212'];
 
     dataTag = 'deceduti';
-    draw( "Deceduti", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
+    draw( "Deceduti", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
 
-    chartOptions.vAxis = {
-        title: 'Deceduti',
-        scaleType: 'lin',
-        //ticks: [ 0, 250, 500, 750, 1000 ]
+    chartOptions.colors = [ '#0012F2', '#0082F2'  ];
+
+    dataTag = 'tamponi';
+    draw( "Tamponi", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
+
+}
+
+async function drawChartTrentino () {
+    //let res = await fetch( urlsDataTrentino.urlandamentocasi );
+    //let csvString = await res.text();
+    //const json = await csv().fromString( csvString );
+    //console.log( json );
+    let res = await fetch( urlsDataTrentino.urlstatoclinico );
+    let csvString = await res.text();
+    const json = await csv().fromString( csvString );
+    console.log( "Trentino", json );
+    let totaleList = [];
+    let nuoviList = [];
+    let ratioList = [];
+
+    let terapia_intensiva = [];
+    let deceduti = [];
+    let ospedalizzati = [];
+
+    let beforeDaily = Infinity;
+    let date;
+
+    let ultimiDeceduti = 0;
+    let ultimiTerapia = 0;
+    let ultimiOspedalizzati = 0;
+
+    //let beforeDaily = json[ 0 ].day;
+    for ( daily of json ) {
+        date = new Date( daily.giorno.split( "/" ).reverse().join( "-" ) );
+        let nuovi_positivi = parseInt( daily.incremento );
+        let ratio = nuovi_positivi / beforeDaily;
+        beforeDaily = nuovi_positivi;
+        totaleList.push( [ date, parseInt( daily.totale_pos ) ] );
+        nuoviList.push( [ date, nuovi_positivi ] );
+        ratioList.push( [ date, ratio ] );
+        //deceduti = parseInt( day.deceduti );
+        console.log( "Trentino totale positivi:", date, parseInt( daily.totale_pos ) );
+
+        let inf = parseInt( daily.infettive );
+        let alta = parseInt( daily.alta_int );
+        let inte = parseInt( daily.terapia_in );
+        let tot = inf + alta + inte;
+        let terap = alta + inte;
+
+
+        ospedalizzati.push( [ date, tot - ultimiOspedalizzati, tot ] );
+        ultimiOspedalizzati = tot;
+
+        terapia_intensiva.push( [ date, terap - ultimiTerapia, terap ] );
+        ultimiTerapia = terap;
+
+        deceduti.push( [ date, parseInt( daily.deceduti ) - ultimiDeceduti, parseInt( daily.deceduti )  ]);
+        ultimiDeceduti = parseInt(daily.deceduti);
+
+
+    }
+
+    console.log( "Trentino", "nuovi dec.", deceduti );
+
+    let header = document.querySelector( '#head-trentino' );
+    let titleH1 = document.createElement( 'p' );
+    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]}`;
+    titleH1.className = "lead";
+    header.appendChild( titleH1 );
+
+    const chartOptions = {
+        width: 800,
+        height: 500,
+        chartArea: { width: '50%' },
+
+        hAxis: {
+            title: 'Date'
+        },
     };
 
-    dataTag = 'nuovi_deceduti';
-    draw( "Nuovi deceduti", fillDatesTable( dataTag, data[ dataTag ] ), dataTag, chartOptions );
+
+    chartOptions.series = {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: { axis: 'nuovi' },
+        1: { axis: 'totale' }
+    };
+    chartOptions.axes = {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+            nuovi: { label: 'Nuovi' },
+            totale: { label: 'Totale' }
+        }
+    }
+    chartOptions.legend = { position: 'none' }
+
+    chartOptions.colors = [ '#0012F2', '#F012F2' ];
+    dataTag = 'ospedalizzati_trentino'
+    draw( "Ospedalizzati. Dati APSS",
+        fillDatesTable( dataTag, ospedalizzati, 2 ), dataTag, chartOptions );
+
+    chartOptions.colors = [ '#6F5694', '#FF5694' ];
+    dataTag = 'terapia_intensiva_trentino'
+    draw( "In terapia intensiva/alta intensità. Dati APSS",
+        fillDatesTable( dataTag, terapia_intensiva, 2 ), dataTag, chartOptions );
+
+    chartOptions.colors = [ '#c21212', '#c28212' ];
+    dataTag = 'deceduti_trentino'
+    draw( "Deceduti. Dati APSS",
+        fillDatesTable( dataTag, deceduti, 2 ), dataTag, chartOptions );
+
 
 }
 
 async function drawChartComuni () {
     let res = await fetch( window.location.origin + "/cov19-trentino.json" );
     let json = await res.json();
-    const COMUNE = "ROVERETO";
+    let comune = document.querySelector( '#comune' ).value;
+
+    const COMUNE = comune || "ROVERETO";
     let dailyList = [];
     let ratioList = [];
     let casesList = [];
@@ -197,6 +284,8 @@ async function drawChartComuni () {
     for ( day of json ) {
         date = new Date( day.date );
         data = day.cov19_data;
+        console.log(COMUNE,"Dati:",  data);
+
         if ( data[ 0 ][ 0 ] === "Lat" ) {
             idx = 3;
         } else if ( data[ 0 ][ 0 ] === "codice") {
@@ -208,35 +297,33 @@ async function drawChartComuni () {
         let cases = data.filter( ( row ) => {
             return row[ idx - 1 ] === COMUNE;
         } )[ 0 ];
+        if ( !cases ) {
+            continue;
+        }
         data.shift();
-        let total = data.reduce( ( accumulator, currentValue ) => accumulator + parseInt( currentValue[ 3 ] ), 0 );
         let comune = parseInt( cases[ idx ] );
         let daily = comune - before;
         let ratio = daily / beforeDaily;
-        console.log( COMUNE, date, ratio, daily, beforeDaily );
+        //console.log( COMUNE, date, ratio, daily, beforeDaily );
         if ( idx === 2 ) {
             let last = cases[ idx + 2 ];
-            deadsList.push( [ date, parseInt( last ) ] );
-            deadsDailyList.push( [ date, parseInt( last - deads ) ] );
+            deadsList.push( [ date, parseInt( last ) - parseInt( deads ), parseInt( last ) ] );
             deads = last;
         }
         beforeDaily = daily;
         before = comune;
-        casesList.push( [ date, comune ] );
-        dailyList.push( [ date, daily ] );
+        casesList.push( [ date, daily, comune ] );
         ratioList.push( [ date, ratio ] );
         //console.log( date, total );
     }
     let header = document.querySelector( '#head-comune' );
     let title = document.querySelector( '#head-comune > h1' );
-    title.textContent += COMUNE;
-    let titleH1 = document.createElement( 'p' );
+    title.textContent = `Dati di ${COMUNE}`;
+    let titleH1 = document.querySelector( '#head-comune > p' );
     titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]} ${date.toLocaleTimeString()}`;
     titleH1.className = "lead";
-    header.appendChild( titleH1 );
 
-    var chartOptions = {
-        title: 'Nessuno',
+    const chartOptions = {
         width: 800,
         height: 500,
         chartArea: { width: '50%' },
@@ -244,154 +331,40 @@ async function drawChartComuni () {
         hAxis: {
             title: 'Date'
         },
-        vAxis: {
-            title: 'Positivi',
-            //ticks: [ 0, 200, 400, 600, 800, 1000 ]
-        },
-        trendlines: {
-            0: {
-                type: 'exponential',
-                showR2: true,
-                visibleInLegend: true
-            }
-        }
-
     };
-    chartOptions.trendlines[ 0 ].type = 'exponential';
+
+
+    chartOptions.series = {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: { axis: 'nuovi' },
+        1: { axis: 'totale' }
+    };
+    chartOptions.axes = {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+            nuovi: { label: 'Nuovi' },
+            totale: { label: 'Totale' }
+        }
+    }
+    chartOptions.legend = { position: 'none' }
+
+    chartOptions.colors = [ '#0012F2', '#F012F2' ];
 
     dataTag = 'comuni'
-    draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, casesList ), dataTag, chartOptions );
-    chartOptions.trendlines[ 0 ].type = 'exponential';
+    draw( "Totale positivi. Dati APSS",
+        fillDatesTable( dataTag, casesList, 2 ), dataTag, chartOptions );
 
-    chartOptions.vAxis = {
-        title: 'Positivi',
-        scaleType: 'lin',
-        //ticks: [ 0, 50, 100, 150, 200 ]
-    };
-
-    dataTag = 'nuovi_comuni'
-    draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, dailyList ), dataTag, chartOptions );
-
-    chartOptions.colors = [ '#c21212' ];
-    chartOptions.vAxis = {
-        title: 'Deceduti',
-        scaleType: 'lin',
-    };
-
-
+    chartOptions.colors = [ '#c21212', '#c28212' ];
     dataTag = 'comuni_deceduti'
-    draw( "Deceduti. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, deadsList ), dataTag, chartOptions );
-
-    dataTag = 'comuni_nuovi_deceduti'
-    draw( "Nuovi deceduti. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, deadsDailyList ), dataTag, chartOptions );
-}
-
-async function drawChartTrentino () {
-    //let res = await fetch( urlsDataTrentino.urlandamentocasi );
-    //let csvString = await res.text();
-    //const json = await csv().fromString( csvString );
-    //console.log( json );
-    let res = await fetch( urlsDataTrentino.urlstatoclinico );
-    let csvString = await res.text();
-    const json = await csv().fromString( csvString );
-    console.log( json );
-    let totaleList = [];
-    let nuoviList = [];
-    let ratioList = [];
-    let decedutiList = [];
-    let decedutiNuoviList = [];
-    let beforeDaily = Infinity;
-    let date;
-    let deceduti = 0;
-    //let beforeDaily = json[ 0 ].day;
-    for ( day of json ) {
-        date = new Date( day.giorno.split( "/" ).reverse().join( "-" ) );
-        let daily = parseInt( day.incremento );
-        let ratio = daily / beforeDaily;
-        beforeDaily = daily;
-        totaleList.push( [ date, parseInt( day.totale_pos ) ] );
-        nuoviList.push( [ date, daily ] );
-        ratioList.push( [ date, ratio ] );
-        decedutiList.push( [ date, parseInt( day.deceduti ) ] );
-        decedutiNuoviList.push( [ date, parseInt( day.deceduti ) - deceduti ] );
-        deceduti = parseInt( day.deceduti );
-        console.log( date, parseInt( day.totale_pos ) );
-    }
-
-    console.log( "nuovi dec.", decedutiNuoviList );
-
-    let header = document.querySelector( '#head-trentino' );
-    let titleH1 = document.createElement( 'p' );
-    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]}`;
-    titleH1.className = "lead";
-    header.appendChild( titleH1 );
-
-    var chartOptions = {
-        title: 'Nessuno',
-        width: 800,
-        height: 500,
-        chartArea: { width: '50%' },
-
-        hAxis: {
-            title: 'Date'
-        },
-        vAxis: {
-            title: 'Positivi',
-            //ticks: [ 0, 200, 400, 600, 800, 1000 ]
-        },
-        trendlines: {
-            0: {
-                type: 'exponential',
-                showR2: true,
-                visibleInLegend: true
-            }
-        }
-
-    };
-
-    dataTag = 'trentino'
-    draw( "Totale positivi. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, totaleList ), dataTag, chartOptions );
-
-    chartOptions.vAxis = {
-        title: 'Positivi',
-        scaleType: 'lin',
-        //ticks: [ 0, 50, 100, 150, 200 ]
-    };
-
-    dataTag = 'nuovi_trentino'
-    draw( "Nuovi positivi. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, nuoviList ), dataTag, chartOptions );
-
-    chartOptions.vAxis = {
-        title: 'Positivi',
-        scaleType: 'lin',
-        //ticks: [ 0, 0.5, 1, 1.5, 2 ]
-    };
-    chartOptions.trendlines[ 0 ].type = 'linear';
-
-    dataTag = 'trentino_ratio'
-    draw( "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
-        fillDatesTable( dataTag, ratioList ), dataTag, chartOptions );
-
-    chartOptions.colors = [ '#c21212' ];
-    chartOptions.vAxis = {
-        title: 'Deceduti',
-        scaleType: 'lin',
-        //ticks: [ 0, 0.5, 1, 1.5, 2 ]
-    };
-    chartOptions.trendlines[ 0 ].type = 'exponential';
-
-    dataTag = 'deceduti_trentino'
-    draw( "Totale deceduti. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, decedutiList ), dataTag, chartOptions );
-
-    dataTag = 'nuovi_deceduti_trentino'
-    draw( "Nuovi deceduti. Dati ricavati da quelli pubblicati dall'APSS",
-        fillDatesTable( dataTag, decedutiNuoviList ), dataTag, chartOptions );
+    draw( "Deceduti. Dati APSS",
+        fillDatesTable( dataTag, deadsList, 2 ), dataTag, chartOptions );
 
 }
+
+function handleOptions (e) {
+    google.charts.setOnLoadCallback( drawChartComuni );
+
+}
+
+let comune = document.querySelector( "#comune" );
+comune.addEventListener( "change", handleOptions, false );

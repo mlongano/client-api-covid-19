@@ -29,7 +29,7 @@ getData()
     .then( json => {
         google.charts.load( "current", { packages: [ "corechart" ] } );
 
-        let previous = json[ 0 ].nuovi_attualmente_positivi;
+        let previous = json[ 0 ].nuovi_positivi;
         var options = {
             dataAxis: { showMinorLabels: true },
             legend: { left: { position: "bottom-left" } },
@@ -46,8 +46,8 @@ getData()
         for ( daily of json ) {
             let date = daily.data.split( " " )[ 0 ];
             console.log( date );
-            let ratio = daily.nuovi_attualmente_positivi / previous;
-            previous = daily.nuovi_attualmente_positivi;
+            let ratio = daily.nuovi_positivi / previous;
+            previous = daily.nuovi_positivi;
             console.log( daily );
             items.push( { x: date, y: ratio } )
             data.push( [ date, 1.2 ] );

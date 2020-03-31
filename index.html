@@ -14,49 +14,51 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <div class="container-fluid">
 
-    <section>
-        <header id="head-nazionali" class="header">
-            <h1 class="display-1">Dati Nazionali</h1>
-        </header>
-        <article class="d-flex flex-wrap">
-            <div class="chart" id="ratio"></div>
-            <div class="chart" id="totale_casi"></div>
-            <div class="chart" id="nuovi_attualmente_positivi"></div>
-            <div class="chart" id="terapia_intensiva"></div>
-            <div class="chart" id="deceduti"></div>
-            <div class="chart" id="nuovi_deceduti"></div>
-        </article>
-    </section>
-    <section>
-        <header id="head-trentino" class="header">
-            <h1 class="display-1">Dati del Trentino</h1>
-        </header>
-        <article class="d-flex flex-wrap">
-            <h2 class="chart" id="trentino">&nbsp;</h2>
-            <h2 class="chart" id="nuovi_trentino">&nbsp;</h2>
-            <h2 class="chart" id="trentino_ratio">&nbsp;</h2>
-            <h2 class="chart" id="deceduti_trentino">&nbsp;</h2>
-            <h2 class="chart" id="nuovi_deceduti_trentino">&nbsp;</h2>
-        </article>
-    </section>
-    <section>
-        <header id="head-comune" class="header">
-            <h1 class="display-1">Dati di </h1>
-            <select name="comune" id="comune">
-                <option value="ROVERETO">ROVERETO</option>
-            </select>
-            <div id="vue"> {{ message }}
-</div>
+        <section>
+            <header id="head-nazionali" class="header">
+                <h1 class="display-1">Dati Nazionali</h1>
+            </header>
+            <article class="d-flex flex-wrap">
+                <h2 class="chart" id="tamponi">&nbsp;</h2>
+                <h2 class="chart" id="ospedalizzati">&nbsp;</h2>
+                <h2 class="chart" id="terapia_intensiva">&nbsp;</h2>
+                <h2 class="chart" id="deceduti">&nbsp;</h2>
+            </article>
+        </section>
+        <section>
+            <header id="head-trentino" class="header">
+                <h1 class="display-1">Dati del Trentino</h1>
+            </header>
+            <article class="d-flex flex-wrap">
+                <h2 class="chart" id="ospedalizzati_trentino">&nbsp;</h2>
+                <h2 class="chart" id="terapia_intensiva_trentino">&nbsp;</h2>
+                <h2 class="chart" id="deceduti_trentino">&nbsp;</h2>
+            </article>
+        </section>
+        <section>
+            <header id="head-comune" class="header">
+                <h1 class="display-1">Dati di </h1>
+                <p>Ultimo aggiornamento</p>
 
-        </header>
-        <article class="d-flex flex-wrap">
-            <h2 class="chart" id="comuni">&nbsp;</h2>
-            <h2 class="chart" id="nuovi_comuni">&nbsp;</h2>
-            <h2 class="chart" id="comuni_ratio">&nbsp;</h2>
-            <h2 class="chart" id="comuni_deceduti">&nbsp;</h2>
-            <h2 class="chart" id="comuni_nuovi_deceduti">&nbsp;</h2>
-        </article>
-    </section>
+                <select name="comune" id="comune">
+                    <option value="ROVERETO">ROVERETO</option>
+                    <option value="MORI">MORI</option>
+                    <option value="ALA">ALA</option>
+                    <option value="ARCO">ARCO</option>
+                    <option value="RIVA DEL GARDA">RIVA DEL GARDA </option>
+                </select>
+                <div id="vue"> {{ message }}
+                </div>
+
+            </header>
+            <article class="d-flex flex-wrap">
+                <h2 class="chart" id="comuni">&nbsp;</h2>
+                <h2 class="chart" id="nuovi_comuni">&nbsp;</h2>
+                <h2 class="chart" id="comuni_ratio">&nbsp;</h2>
+                <h2 class="chart" id="comuni_deceduti">&nbsp;</h2>
+                <h2 class="chart" id="comuni_nuovi_deceduti">&nbsp;</h2>
+            </article>
+        </section>
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
