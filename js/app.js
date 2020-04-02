@@ -19,7 +19,6 @@ google.charts.setOnLoadCallback( drawChartComuni );
 function draw ( title, data, element, options ) {
     options.title = title;
     const chartMaterial = new google.charts.Line( document.getElementById( element ) );
-    const chart = new google.visualization.LineChart( document.getElementById( element ) );
     //chart.draw( data, options );
     chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
 }
@@ -268,11 +267,9 @@ async function drawChartComuni () {
     let comune = document.querySelector( '#comune' ).value;
 
     const COMUNE = comune || "ROVERETO";
-    let dailyList = [];
     let ratioList = [];
     let casesList = [];
     let deadsList = [];
-    let deadsDailyList = [];
     let before = 0;
     let data = json[ 0 ].cov19_data;
     data = Array.from( data );
@@ -316,7 +313,6 @@ async function drawChartComuni () {
         ratioList.push( [ date, ratio ] );
         //console.log( date, total );
     }
-    let header = document.querySelector( '#head-comune' );
     let title = document.querySelector( '#head-comune > h1' );
     title.textContent = `Dati di ${COMUNE}`;
     let titleH1 = document.querySelector( '#head-comune > p' );
@@ -361,7 +357,7 @@ async function drawChartComuni () {
 
 }
 
-function handleOptions (e) {
+function handleOptions () {
     google.charts.setOnLoadCallback( drawChartComuni );
 
 }
