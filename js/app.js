@@ -6,6 +6,9 @@ const urlsDataTrentino = {
     urlsituazionecomuni: 'https://covid19trentino.fbk.eu/data/stato_comuni_td.csv'
 };
 
+const CHART_WIDTH = 600;
+const CHART_HIGHT = 400;
+
 //return fetch( "https://coronavirus-tracker-api.herokuapp.com/all" );
 const urlDataItaly = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json";
 
@@ -106,12 +109,12 @@ async function drawChartItaly () {
     let header = document.querySelector( '#head-nazionali' );
     let titleH1 = document.createElement( 'p' );
     titleH1.textContent = `Ultimo aggiornamento ${data.date}`;
-    titleH1.className = "lead";
+    titleH1.className = "lead subtitle";
     header.appendChild( titleH1 );
 
     const chartOptions = {
-        width: 800,
-        height: 500,
+        width: CHART_WIDTH,
+        height: CHART_HIGHT,
         chartArea: { width: '50%' },
 
         hAxis: {
@@ -215,12 +218,12 @@ async function drawChartTrentino () {
     let header = document.querySelector( '#head-trentino' );
     let titleH1 = document.createElement( 'p' );
     titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]}`;
-    titleH1.className = "lead";
+    titleH1.className = "lead subtitle";
     header.appendChild( titleH1 );
 
     const chartOptions = {
-        width: 800,
-        height: 500,
+        width: CHART_WIDTH,
+        height: CHART_HIGHT,
         chartArea: { width: '50%' },
 
         hAxis: {
@@ -317,11 +320,11 @@ async function drawChartComuni () {
     title.textContent = `Dati di ${COMUNE}`;
     let titleH1 = document.querySelector( '#head-comune > p' );
     titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]} ${date.toLocaleTimeString()}`;
-    titleH1.className = "lead";
+    titleH1.className = "lead subtitle";
 
     const chartOptions = {
-        width: 800,
-        height: 500,
+        width: CHART_WIDTH,
+        height: CHART_HIGHT,
         chartArea: { width: '50%' },
 
         hAxis: {

@@ -4,5 +4,18 @@
 
 }
 
-.chart {
+.charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 600px);
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+}
+
+.columns {
+    flex-wrap: wrap;
+}
+
+.hero {
+    padding-bottom: 3rem;
+    padding-left: 3rem;
 }
