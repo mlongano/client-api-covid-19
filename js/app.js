@@ -108,7 +108,7 @@ async function drawChartItaly () {
     let data = extractInfo( json );
     let header = document.querySelector( '#head-nazionali' );
     let titleH1 = document.createElement( 'p' );
-    titleH1.textContent = `Ultimo aggiornamento ${data.date}`;
+    titleH1.textContent = `Ultimo aggiornamento ${data.date.split( "T" )[ 0 ].split("-").reverse().join("/")}`;
     titleH1.className = "lead subtitle";
     header.appendChild( titleH1 );
 
@@ -217,7 +217,7 @@ async function drawChartTrentino () {
 
     let header = document.querySelector( '#head-trentino' );
     let titleH1 = document.createElement( 'p' );
-    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]}`;
+    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ].split( "-" ).reverse().join( "/" )}`;
     titleH1.className = "lead subtitle";
     header.appendChild( titleH1 );
 
@@ -319,7 +319,7 @@ async function drawChartComuni () {
     let title = document.querySelector( '#head-comune > h1' );
     title.textContent = `Dati di ${COMUNE}`;
     let titleH1 = document.querySelector( '#head-comune > p' );
-    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ]} ${date.toLocaleTimeString()}`;
+    titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ].split( "-" ).reverse().join( "/" )}`;
     titleH1.className = "lead subtitle";
 
     const chartOptions = {
