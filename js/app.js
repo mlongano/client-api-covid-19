@@ -113,10 +113,6 @@ async function drawChartItaly () {
     header.appendChild( titleH1 );
 
     const chartOptions = {
-        width: CHART_WIDTH,
-        height: CHART_HIGHT,
-        chartArea: { width: '50%' },
-
         hAxis: {
             title: 'Date'
         },
@@ -222,15 +218,10 @@ async function drawChartTrentino () {
     header.appendChild( titleH1 );
 
     const chartOptions = {
-        width: CHART_WIDTH,
-        height: CHART_HIGHT,
-        chartArea: { width: '50%' },
-
         hAxis: {
             title: 'Date'
         },
     };
-
 
     chartOptions.series = {
         // Gives each series an axis name that matches the Y-axis below.
@@ -323,10 +314,6 @@ async function drawChartComuni () {
     titleH1.className = "lead subtitle";
 
     const chartOptions = {
-        width: CHART_WIDTH,
-        height: CHART_HIGHT,
-        chartArea: { width: '50%' },
-
         hAxis: {
             title: 'Date'
         },
@@ -367,3 +354,7 @@ function handleOptions () {
 
 let comune = document.querySelector( "#comune" );
 comune.addEventListener( "change", handleOptions, false );
+
+$( window ).resize( function () {
+    drawChartItaly();
+} );

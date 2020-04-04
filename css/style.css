@@ -1,3 +1,7 @@
+:root {
+    --chart-width: 500px;
+    --chart-heigth: 400px;
+}
 .container {
     display: flex;
     flex-wrap: wrap ;
@@ -6,11 +10,17 @@
 
 .charts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 600px);
+    grid-template-columns: repeat(auto-fit, var(--chart-width));
     grid-column-gap: 20px;
     grid-row-gap: 20px;
 }
+.chart {
+    width: var(--chart-width);
+    height: var(--chart-heigth);
+    /* box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22); */
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 
+}
 .columns {
     flex-wrap: wrap;
 }
@@ -18,4 +28,8 @@
 .hero {
     padding-bottom: 3rem;
     padding-left: 3rem;
+}
+
+.chart text {
+    stroke: #888;
 }
