@@ -1,6 +1,13 @@
 :root {
-    --chart-width: 500px;
-    --chart-heigth: 400px;
+    --chart-width: 300px;
+    --chart-heigth: 240px;
+}
+
+@media (min-width: 568px) {
+    :root {
+        --chart-width: 520px;
+        --chart-heigth: 340px;
+    }
 }
 .container {
     display: flex;
@@ -13,6 +20,10 @@
     grid-template-columns: repeat(auto-fit, var(--chart-width));
     grid-column-gap: 20px;
     grid-row-gap: 20px;
+}
+
+.hero {
+    min-width: var(--chart-width);
 }
 .chart {
     width: var(--chart-width);
@@ -27,7 +38,11 @@
 
 .hero {
     padding-bottom: 3rem;
-    padding-left: 3rem;
+    padding-left: 0.5rem;
+}
+
+.hero-body {
+    padding-left: 1rem;
 }
 
 .chart text {
