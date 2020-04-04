@@ -22,9 +22,6 @@
     grid-row-gap: 20px;
 }
 
-.hero {
-    min-width: var(--chart-width);
-}
 .chart {
     width: var(--chart-width);
     height: var(--chart-heigth);
@@ -37,12 +34,17 @@
 }
 
 .hero {
+    min-width: var(--chart-width);
     padding-bottom: 3rem;
     padding-left: 0.5rem;
 }
 
 .hero-body {
     padding-left: 1rem;
+}
+
+.hero-head {
+    padding-top: 1rem;
 }
 
 .chart text {

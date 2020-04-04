@@ -355,6 +355,3 @@ function handleOptions () {
 let comune = document.querySelector( "#comune" );
 comune.addEventListener( "change", handleOptions, false );
 
-$( window ).resize( function () {
-    drawChartItaly();
-} );
