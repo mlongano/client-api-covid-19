@@ -91,10 +91,10 @@ function extractInfo ( json ) {
 
 }
 
-function fillDatesTable ( title, list, ncol=1 ) {
+function fillDatesTable ( titles, list ) {
     let table = new google.visualization.DataTable();
     table.addColumn( 'date', 'Data' );
-    for ( let n = 0; n < ncol; n++ ) {
+    for ( title of titles) {
         table.addColumn( 'number', title );
     }
     table.addRows( list );
@@ -128,29 +128,29 @@ async function drawChartItaly () {
     chartOptions.axes = {
         // Adds labels to each axis; they don't have to match the axis names.
         y: {
-            nuovi: { label: 'Nuovi' },
+            nuovi: { label: 'Incremento' },
             totale: { label: 'Totale' }
         }
     }
     chartOptions.legend = { position: 'none' }
 
     dataTag = 'ospedalizzati';
-    draw( "Ospedalizzati", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Ospedalizzati", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#6F5694', '#FF5694'  ];
 
     dataTag = 'terapia_intensiva';
-    draw( "In terapia intensiva", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "In terapia intensiva", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#c21212',  '#c28212'];
 
     dataTag = 'deceduti';
-    draw( "Deceduti", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Deceduti", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#0012F2', '#0082F2'  ];
 
     dataTag = 'tamponi';
-    draw( "Tamponi", fillDatesTable( dataTag, data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Tamponi", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
 }
 
@@ -231,7 +231,7 @@ async function drawChartTrentino () {
     chartOptions.axes = {
         // Adds labels to each axis; they don't have to match the axis names.
         y: {
-            nuovi: { label: 'Nuovi' },
+            nuovi: { label: 'Incremento' },
             totale: { label: 'Totale' }
         }
     }
@@ -240,17 +240,17 @@ async function drawChartTrentino () {
     chartOptions.colors = [ '#0012F2', '#F012F2' ];
     dataTag = 'ospedalizzati_trentino'
     draw( "Ospedalizzati. Dati APSS",
-        fillDatesTable( dataTag, ospedalizzati, 2 ), dataTag, chartOptions );
+        fillDatesTable( ["Incremento","Totale"], ospedalizzati, 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#6F5694', '#FF5694' ];
     dataTag = 'terapia_intensiva_trentino'
     draw( "In terapia intensiva/alta intensità. Dati APSS",
-        fillDatesTable( dataTag, terapia_intensiva, 2 ), dataTag, chartOptions );
+        fillDatesTable( ["Incremento","Totale"], terapia_intensiva, 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#c21212', '#c28212' ];
     dataTag = 'deceduti_trentino'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( dataTag, deceduti, 2 ), dataTag, chartOptions );
+        fillDatesTable( ["Incremento","Totale"], deceduti, 2 ), dataTag, chartOptions );
 
 
 }
@@ -328,7 +328,7 @@ async function drawChartComuni () {
     chartOptions.axes = {
         // Adds labels to each axis; they don't have to match the axis names.
         y: {
-            nuovi: { label: 'Nuovi' },
+            nuovi: { label: 'Incremento' },
             totale: { label: 'Totale' }
         }
     }
@@ -338,12 +338,12 @@ async function drawChartComuni () {
 
     dataTag = 'comuni'
     draw( "Totale positivi. Dati APSS",
-        fillDatesTable( dataTag, casesList, 2 ), dataTag, chartOptions );
+        fillDatesTable( ["Incremento","Totale"], casesList, 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#c21212', '#c28212' ];
     dataTag = 'comuni_deceduti'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( dataTag, deadsList, 2 ), dataTag, chartOptions );
+        fillDatesTable( ["Incremento","Totale"], deadsList, 2 ), dataTag, chartOptions );
 
 }
 
