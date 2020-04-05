@@ -36,9 +36,11 @@ function extractInfo ( json ) {
     let deceduti = [];
     let tamponi = [];
     let ospedalizzati = [];
+    let dimessi_guariti = [];
     let first = new Date( json[ 0 ].data ).getTime() / 86400000 - 18316;
     let last = first;
     let ultimiDeceduti = 0;
+    let ultimiGuariti = 0;
     let ultimiTamponi = 0;
     let ultimiTerapia = 0;
     let ultimiOspedalizzati = 0;
@@ -71,8 +73,11 @@ function extractInfo ( json ) {
         terapia_intensiva.push( [ last, daily.terapia_intensiva - ultimiTerapia, daily.terapia_intensiva  ]);
         ultimiTerapia = daily.terapia_intensiva;
 
-        deceduti.push( [ last, daily.deceduti - ultimiDeceduti, daily.deceduti  ] );
+        deceduti.push( [ last, daily.deceduti - ultimiDeceduti, daily.deceduti ] );
         ultimiDeceduti = daily.deceduti;
+
+        dimessi_guariti.push( [ last, parseInt( daily.dimessi_guariti ) - ultimiGuariti, parseInt( daily.dimessi_guariti ) ] );
+        ultimiGuariti = daily.dimessi_guariti;
 
         tamponi.push( [ last, daily.tamponi - ultimiTamponi, daily.tamponi ] );
         ultimiTamponi = daily.tamponi;
@@ -85,6 +90,7 @@ function extractInfo ( json ) {
         nuovi_positivi: nuovi_positivi,
         terapia_intensiva: terapia_intensiva,
         deceduti: deceduti,
+        dimessi_guariti: dimessi_guariti,
         tamponi: tamponi,
         ospedalizzati: ospedalizzati,
     }
@@ -118,7 +124,6 @@ async function drawChartItaly () {
         },
     };
 
-    chartOptions.colors = [ '#0012F2', '#F012F2' ];
 
     chartOptions.series = {
         // Gives each series an axis name that matches the Y-axis below.
@@ -134,21 +139,25 @@ async function drawChartItaly () {
     }
     chartOptions.legend = { position: 'none' }
 
+
+    chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'ospedalizzati';
     draw( "Ospedalizzati", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
-    chartOptions.colors = [ '#6F5694', '#FF5694'  ];
-
+    chartOptions.colors = [ '#FFAE25', '#C88005'  ];
     dataTag = 'terapia_intensiva';
     draw( "In terapia intensiva", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
-    chartOptions.colors = [ '#c21212',  '#c28212'];
-
+    chartOptions.colors = [ '#e80e0e',  '#B50000'];
     dataTag = 'deceduti';
     draw( "Deceduti", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
-    chartOptions.colors = [ '#0012F2', '#0082F2'  ];
+    chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
+    dataTag = 'dimessi_guariti';
+    draw( "Dimessi guariti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions );
 
+
+    chartOptions.colors = [ '#0012F2', '#0082F2' ];
     dataTag = 'tamponi';
     draw( "Tamponi", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
 
@@ -169,12 +178,14 @@ async function drawChartTrentino () {
 
     let terapia_intensiva = [];
     let deceduti = [];
+    let guariti = [];
     let ospedalizzati = [];
 
     let beforeDaily = Infinity;
     let date;
 
     let ultimiDeceduti = 0;
+    let ultimiGuariti = 0;
     let ultimiTerapia = 0;
     let ultimiOspedalizzati = 0;
 
@@ -203,10 +214,11 @@ async function drawChartTrentino () {
         terapia_intensiva.push( [ date, terap - ultimiTerapia, terap ] );
         ultimiTerapia = terap;
 
-        deceduti.push( [ date, parseInt( daily.deceduti ) - ultimiDeceduti, parseInt( daily.deceduti )  ]);
-        ultimiDeceduti = parseInt(daily.deceduti);
+        deceduti.push( [ date, parseInt( daily.deceduti ) - ultimiDeceduti, parseInt( daily.deceduti ) ] );
+        ultimiDeceduti = parseInt( daily.deceduti );
 
-
+        guariti.push( [ date, parseInt( daily.guariti ) - ultimiDeceduti, parseInt( daily.guariti ) ] );
+        ultimiGuariti = parseInt( daily.guariti );
     }
 
     console.log( "Trentino", "nuovi dec.", deceduti );
@@ -237,21 +249,25 @@ async function drawChartTrentino () {
     }
     chartOptions.legend = { position: 'none' }
 
-    chartOptions.colors = [ '#0012F2', '#F012F2' ];
+    chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'ospedalizzati_trentino'
     draw( "Ospedalizzati. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], ospedalizzati, 2 ), dataTag, chartOptions );
 
-    chartOptions.colors = [ '#6F5694', '#FF5694' ];
+    chartOptions.colors = [ '#FFAE25', '#C88005' ];
     dataTag = 'terapia_intensiva_trentino'
     draw( "In terapia intensiva/alta intensità. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], terapia_intensiva, 2 ), dataTag, chartOptions );
 
-    chartOptions.colors = [ '#c21212', '#c28212' ];
+    chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'deceduti_trentino'
     draw( "Deceduti. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], deceduti, 2 ), dataTag, chartOptions );
 
+    chartOptions.colors = [ '#0012F2', '#0082F2' ];
+    dataTag = 'guariti_trentino'
+    draw( "Guariti. Dati APSS",
+        fillDatesTable( [ "Incremento", "Totale" ], guariti, 2 ), dataTag, chartOptions );
 
 }
 
@@ -340,7 +356,7 @@ async function drawChartComuni () {
     draw( "Totale positivi. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], casesList, 2 ), dataTag, chartOptions );
 
-    chartOptions.colors = [ '#c21212', '#c28212' ];
+    chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'comuni_deceduti'
     draw( "Deceduti. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], deadsList, 2 ), dataTag, chartOptions );
