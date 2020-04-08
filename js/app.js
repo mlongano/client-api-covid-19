@@ -30,7 +30,7 @@ function extractInfo ( json ) {
     console.log("Italia json:", json);
     let previous = json[ 0 ].nuovi_positivi;
     let ratios = [];
-    let totale_casi = [];
+    let positivi = [];
     let nuovi_positivi = [];
     let terapia_intensiva = [];
     let deceduti = [];
@@ -55,17 +55,13 @@ function extractInfo ( json ) {
         last = new Date( date );
         ratios.push( [ last, ratio ] );
         let tc = 0;
-        if ( daily.totale_casi === "") {
-
-        }
-        if (daily.totale_casi instanceof String) {
-            tc = parseInt( daily.totale_casi );
+        if (daily.totale_positivi instanceof String) {
+            tc = parseInt( daily.totale_positivi );
         } else {
-            tc = daily.totale_casi;
+            tc = daily.totale_positivi;
         };
 
-        totale_casi.push( [ last, tc ] );
-        nuovi_positivi.push( [ last, daily.nuovi_positivi ] );
+        positivi.push( [ last, tc, daily.nuovi_positivi ] );
 
         ospedalizzati.push( [ last, daily.totale_ospedalizzati - ultimiOspedalizzati, daily.totale_ospedalizzati ] );
         ultimiOspedalizzati = daily.totale_ospedalizzati;
@@ -86,8 +82,7 @@ function extractInfo ( json ) {
     return {
         date: lastDateTime,
         ratios: ratios,
-        totale_casi: totale_casi,
-        nuovi_positivi: nuovi_positivi,
+        positivi: positivi,
         terapia_intensiva: terapia_intensiva,
         deceduti: deceduti,
         dimessi_guariti: dimessi_guariti,
@@ -159,7 +154,11 @@ async function drawChartItaly () {
 
     chartOptions.colors = [ '#0012F2', '#0082F2' ];
     dataTag = 'tamponi';
-    draw( "Tamponi", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Tamponi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions );
+
+    chartOptions.colors = [ '#0012F2', '#0082F2' ];
+    dataTag = 'positivi';
+    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions );
 
 }
 
