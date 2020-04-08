@@ -6,8 +6,10 @@ const urlsDataTrentino = {
     urlsituazionecomuni: 'https://covid19trentino.fbk.eu/data/stato_comuni_td.csv'
 };
 
-const CHART_WIDTH = 600;
 const CHART_HIGHT = 400;
+var CHART_WIDTH = getComputedStyle( document.documentElement )
+    .getPropertyValue( '--chart-width' );
+
 
 //return fetch( "https://coronavirus-tracker-api.herokuapp.com/all" );
 const urlDataItaly = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json";
@@ -19,11 +21,28 @@ google.charts.setOnLoadCallback( drawChartItaly );
 google.charts.setOnLoadCallback( drawChartTrentino );
 google.charts.setOnLoadCallback( drawChartComuni );
 
-function draw ( title, data, element, options ) {
+function draw ( title, data, element, options, readyHandler = ( () => { } ) ) {
     options.title = title;
     const chartMaterial = new google.charts.Line( document.getElementById( element ) );
     //chart.draw( data, options );
+    google.visualization.events.addListener( chartMaterial, 'ready', readyHandler );
+
     chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
+}
+
+function handleChartReady ( e ) {
+    let titles = document.querySelectorAll( "svg defs+g rect+text" );
+    let chart = document.querySelector( ".chart" );
+    let chartWidth = chart.offsetWidth;
+
+    for ( const title of titles ) {
+        let bbox = title.getBBox();
+        let width = bbox.width;
+        let offset = ( chartWidth - width ) / 2;
+
+        title.setAttribute( "x", offset.toString() );
+        title.setAttribute( "y", "25" );
+    }
 }
 
 function extractInfo ( json ) {
@@ -158,7 +177,7 @@ async function drawChartItaly () {
 
     chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'positivi';
-    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, handleChartReady );
 
 }
 
@@ -229,6 +248,13 @@ async function drawChartTrentino () {
     header.appendChild( titleH1 );
 
     const chartOptions = {
+        titleTextStyle: {
+            color: "#888",
+            fontName: 'BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif',
+            fontSize: 18,
+            bold: false,
+            italic: false
+        },
         hAxis: {
             title: 'Date'
         },
@@ -250,12 +276,12 @@ async function drawChartTrentino () {
 
     chartOptions.colors = [ '#c805b9', '#76056e' ];
     dataTag = 'ospedalizzati_trentino'
-    draw( "Ospedalizzati. Dati APSS",
+    draw( "   Ospedalizzati. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], ospedalizzati, 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#FFAE25', '#C88005' ];
     dataTag = 'terapia_intensiva_trentino'
-    draw( "In terapia intensiva/alta intensità. Dati APSS",
+    draw( "   In terapia intensiva/alta intensità. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], terapia_intensiva, 2 ), dataTag, chartOptions );
 
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
@@ -266,8 +292,7 @@ async function drawChartTrentino () {
     chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
     dataTag = 'guariti_trentino'
     draw( "Guariti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], guariti, 2 ), dataTag, chartOptions );
-
+        fillDatesTable( [ "Incremento", "Totale" ], guariti, 2 ), dataTag, chartOptions, handleChartReady );
 }
 
 async function drawChartComuni () {
@@ -357,7 +382,7 @@ async function drawChartComuni () {
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'comuni_deceduti'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( ["Incremento","Totale"], deadsList, 2 ), dataTag, chartOptions );
+        fillDatesTable( [ "Incremento", "Totale" ], deadsList, 2 ), dataTag, chartOptions, handleChartReady );
 
 }
 
