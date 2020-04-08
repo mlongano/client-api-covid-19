@@ -30,8 +30,8 @@ function draw ( title, data, element, options, readyHandler = ( () => { } ) ) {
     chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
 }
 
-function handleChartReady ( e ) {
-    let titles = document.querySelectorAll( "svg defs+g rect+text" );
+function handleChartReady ( elementId ) {
+    let titles = document.querySelectorAll( "#"+elementId+" svg defs+g rect+text" );
     let chart = document.querySelector( ".chart" );
     let chartWidth = chart.offsetWidth;
 
@@ -156,28 +156,28 @@ async function drawChartItaly () {
 
     chartOptions.colors = [ '#c805b9', '#76056e' ];
     dataTag = 'ospedalizzati';
-    draw( "Ospedalizzati", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Ospedalizzati", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, () => handleChartReady( 'ospedalizzati' ) );
 
     chartOptions.colors = [ '#FFAE25', '#C88005'  ];
     dataTag = 'terapia_intensiva';
-    draw( "In terapia intensiva", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "In terapia intensiva", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, () => handleChartReady( 'terapia_intensiva' ) );
 
     chartOptions.colors = [ '#e80e0e',  '#B50000'];
     dataTag = 'deceduti';
-    draw( "Deceduti", fillDatesTable( ["Incremento","Totale"], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Deceduti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, () => handleChartReady( 'deceduti' ) );
 
     chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
     dataTag = 'dimessi_guariti';
-    draw( "Dimessi guariti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Dimessi guariti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, () => handleChartReady( 'dimessi_guariti' ) );
 
 
     chartOptions.colors = [ '#0012F2', '#0082F2' ];
     dataTag = 'tamponi';
-    draw( "Tamponi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions );
+    draw( "Tamponi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, () => handleChartReady( 'tamponi' ) );
 
     chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'positivi';
-    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, handleChartReady );
+    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], 2 ), dataTag, chartOptions, () => handleChartReady( 'positivi') );
 
 }
 
@@ -277,22 +277,22 @@ async function drawChartTrentino () {
     chartOptions.colors = [ '#c805b9', '#76056e' ];
     dataTag = 'ospedalizzati_trentino'
     draw( "   Ospedalizzati. Dati APSS",
-        fillDatesTable( ["Incremento","Totale"], ospedalizzati, 2 ), dataTag, chartOptions );
+        fillDatesTable( [ "Incremento", "Totale" ], ospedalizzati, 2 ), dataTag, chartOptions, () => handleChartReady( 'ospedalizzati_trentino' ) );
 
     chartOptions.colors = [ '#FFAE25', '#C88005' ];
     dataTag = 'terapia_intensiva_trentino'
     draw( "   In terapia intensiva/alta intensità. Dati APSS",
-        fillDatesTable( ["Incremento","Totale"], terapia_intensiva, 2 ), dataTag, chartOptions );
+        fillDatesTable( [ "Incremento", "Totale" ], terapia_intensiva, 2 ), dataTag, chartOptions, () => handleChartReady( 'terapia_intensiva_trentino' ) );
 
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'deceduti_trentino'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( ["Incremento","Totale"], deceduti, 2 ), dataTag, chartOptions );
+        fillDatesTable( [ "Incremento", "Totale" ], deceduti, 2 ), dataTag, chartOptions, () => handleChartReady( 'deceduti_trentino' ) );
 
     chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
     dataTag = 'guariti_trentino'
     draw( "Guariti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], guariti, 2 ), dataTag, chartOptions, handleChartReady );
+        fillDatesTable( [ "Incremento", "Totale" ], guariti, 2 ), dataTag, chartOptions, () => handleChartReady( 'guariti_trentino' ) );
 }
 
 async function drawChartComuni () {
@@ -377,12 +377,12 @@ async function drawChartComuni () {
     chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'comuni'
     draw( "Totale positivi. Dati APSS",
-        fillDatesTable( ["Incremento","Totale"], casesList, 2 ), dataTag, chartOptions );
+        fillDatesTable( [ "Incremento", "Totale" ], casesList, 2 ), dataTag, chartOptions, () => handleChartReady( 'comuni' ) );
 
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'comuni_deceduti'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], deadsList, 2 ), dataTag, chartOptions, handleChartReady );
+        fillDatesTable( [ "Incremento", "Totale" ], deadsList, 2 ), dataTag, chartOptions, () => handleChartReady( 'comuni_deceduti' ) );
 
 }
 
