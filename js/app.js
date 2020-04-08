@@ -370,3 +370,26 @@ function handleOptions () {
 let comune = document.querySelector( "#comune" );
 comune.addEventListener( "change", handleOptions, false );
 
+function isMobileDevice () {
+    return ( typeof window.orientation !== "undefined" ) || ( navigator.userAgent.indexOf( 'IEMobile' ) !== -1 );
+};
+
+// http://arcg.is/C1unv (versione desktop) e http://arcg.is/081a51 (versione mobile)
+
+function addLink ( selector, linkDesktop, linkMobile = "" ) {
+
+    let title = document.querySelector( selector );
+    let titleText = title.firstChild;
+    let link = document.createElement( 'a' );
+    console.log( title.firstChild );
+
+    linkMobile = linkMobile || linkDesktop;
+    link.href = isMobileDevice() ? linkMobile : linkDesktop;
+    link.target = "_blank"
+    link.textContent = titleText.textContent;
+    title.replaceChild( link, titleText );
+    console.log( title.firstChild );
+}
+
+addLink( "#head-nazionali h1", "http://arcg.is/C1unv", "http://arcg.is/081a51" );
+addLink( "#head-trentino h1", "https://covid19trentino.fbk.eu");
