@@ -248,7 +248,7 @@ async function drawChartTrentino () {
     }
     chartOptions.legend = { position: 'none' }
 
-    chartOptions.colors = [ '#976393', '#685489' ];
+    chartOptions.colors = [ '#c805b9', '#76056e' ];
     dataTag = 'ospedalizzati_trentino'
     draw( "Ospedalizzati. Dati APSS",
         fillDatesTable( ["Incremento","Totale"], ospedalizzati, 2 ), dataTag, chartOptions );
