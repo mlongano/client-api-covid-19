@@ -3,7 +3,7 @@
 
 [Dati COVID-19 Italia](https://github.com/pcm-dpc/COVID-19)
 
-Pubblicazione del sito su [Netlify](https://pensive-wing-304270.netlify.com/)
+Pubblicazione del sito su [Netlify](https://covid-19-italia-trentino.netlify.com)
 
 ### TODO
 
