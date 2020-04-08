@@ -133,6 +133,13 @@ async function drawChartItaly () {
     header.appendChild( titleH1 );
 
     const chartOptions = {
+        titleTextStyle: {
+            color: "#888",
+            fontName: 'BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif',
+            fontSize: 22,
+            bold: false,
+            italic: false
+        },
         hAxis: {
             title: 'Date'
         },
@@ -251,7 +258,7 @@ async function drawChartTrentino () {
         titleTextStyle: {
             color: "#888",
             fontName: 'BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif',
-            fontSize: 18,
+            fontSize: 22,
             bold: false,
             italic: false
         },
@@ -354,6 +361,14 @@ async function drawChartComuni () {
     titleH1.className = "lead subtitle";
 
     const chartOptions = {
+        titlePosition: "out",
+        titleTextStyle: {
+            color: "#888",
+            fontName: 'BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif',
+            fontSize: 22,
+            bold: false,
+            italic: false
+        },
         hAxis: {
             title: 'Date'
         },

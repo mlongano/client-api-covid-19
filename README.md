@@ -11,4 +11,5 @@ Pubblicazione del sito su [Netlify](https://covid-19-italia-trentino.netlify.com
  - [x] Aggiornamento al nuovo sito dei dati del Trentino [link](https://covid19trentino.fbk.eu/)
  - [x] Estrazione dei dati di Rovereto
  - [x] Miglioramento della grafica
+ - [ ] Refactor dei grafici con D3.js
  - [ ] Usare vue.js per la scelta del comune
