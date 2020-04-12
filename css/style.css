@@ -69,3 +69,47 @@ a:hover {
   background-repeat: repeat-x;
   text-decoration: none;
 }
+
+.d-center {
+  display: flex;
+  align-items: center;
+}
+.v-select {
+    width: var(--chart-width);
+    min-width: 370px;
+}
+
+.v-select .dropdown li {
+  border-bottom: 1px solid rgba(112, 128, 144, 0.1);
+}
+
+.v-select .dropdown li:last-child {
+  border-bottom: none;
+}
+
+.v-select .dropdown li a {
+  padding: 10px 20px;
+  width: 100%;
+  font-size: 1.25em;
+  color: #3c3c3c;
+}
+
+.v-select .dropdown-menu .active > a {
+  color: rgb(146, 101, 101);
+}
+
+.vs__no-options {
+    color: #3c3c3c;
+}
+
+.vs__dropdown-toggle {
+  background-color: #fff;
+}
+
+#vs1__listbox {
+    font-size: 0.7rem;
+}
+
+.vs__selected {
+    font-size: 0.7rem;
+}

@@ -19,7 +19,7 @@ google.charts.load( 'current', { 'packages': [ 'corechart', 'line' ] } );
 
 google.charts.setOnLoadCallback( drawChartItaly );
 google.charts.setOnLoadCallback( drawChartTrentino );
-google.charts.setOnLoadCallback( drawChartComuni );
+//google.charts.setOnLoadCallback( drawChartComuni );
 
 function draw ( title, data, element, options, readyHandler = ( () => { } ) ) {
     options.title = title;
@@ -97,7 +97,7 @@ function extractInfo ( json ) {
         tamponi.push( [ last, daily.tamponi - ultimiTamponi, daily.tamponi ] );
         ultimiTamponi = daily.tamponi;
     }
-    console.log( "Italia deceduti:", deceduti);
+    //console.log( "Italia deceduti:", deceduti);
     return {
         date: lastDateTime,
         ratios: ratios,
@@ -301,12 +301,10 @@ async function drawChartTrentino () {
 
 }
 
-async function drawChartComuni () {
+async function drawChartComuni (selected) {
     let res = await fetch( window.location.origin + "/cov19-trentino.json" );
     let json = await res.json();
-    let comune = document.querySelector( '#comune' ).value;
-
-    const COMUNE = comune || "ROVERETO";
+    const COMUNE = selected || "ROVERETO";
     let ratioList = [];
     let casesList = [];
     let deadsList = [];
@@ -321,7 +319,7 @@ async function drawChartComuni () {
     for ( day of json ) {
         date = new Date( day.date );
         data = day.cov19_data;
-        console.log(COMUNE,"Dati:",  data);
+        //console.log(COMUNE,"Dati:",  data);
 
         if ( data[ 0 ][ 0 ] === "Lat" ) {
             idx = 3;
@@ -399,14 +397,6 @@ async function drawChartComuni () {
         fillDatesTable( [ "Incremento", "Totale" ], deadsList, 2 ), dataTag, chartOptions, () => handleChartReady( 'comuni_deceduti' ) );
 
 }
-
-function handleOptions () {
-    google.charts.setOnLoadCallback( drawChartComuni );
-
-}
-
-let comune = document.querySelector( "#comune" );
-comune.addEventListener( "change", handleOptions, false );
 
 function isMobileDevice () {
     return ( typeof window.orientation !== "undefined" ) || ( navigator.userAgent.indexOf( 'IEMobile' ) !== -1 );
