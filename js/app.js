@@ -197,14 +197,12 @@ async function drawChartTrentino () {
     let csvString = await res.text();
     const json = await csv().fromString( csvString );
     console.log( "Trentino", json );
-    let totaleList = [];
-    let nuoviList = [];
-    let ratioList = [];
 
     let terapia_intensiva = [];
     let deceduti = [];
     let guariti = [];
     let ospedalizzati = [];
+    let positivi = [];
 
     let beforeDaily = Infinity;
     let date;
@@ -214,17 +212,11 @@ async function drawChartTrentino () {
     let ultimiTerapia = 0;
     let ultimiOspedalizzati = 0;
 
-    //let beforeDaily = json[ 0 ].day;
     for ( daily of json ) {
         date = new Date( daily.giorno.split( "/" ).reverse().join( "-" ) );
         let nuovi_positivi = parseInt( daily.incremento );
         let ratio = nuovi_positivi / beforeDaily;
         beforeDaily = nuovi_positivi;
-        totaleList.push( [ date, parseInt( daily.totale_pos ) ] );
-        nuoviList.push( [ date, nuovi_positivi ] );
-        ratioList.push( [ date, ratio ] );
-        //deceduti = parseInt( day.deceduti );
-        console.log( "Trentino totale positivi:", date, parseInt( daily.totale_pos ) );
 
         let inf = parseInt( daily.infettive );
         let alta = parseInt( daily.alta_int );
@@ -232,6 +224,7 @@ async function drawChartTrentino () {
         let tot = inf + alta + inte;
         let terap = alta + inte;
 
+        positivi.push( [ date, parseInt( daily.incremento ), parseInt( daily.pos_att ) ] );
 
         ospedalizzati.push( [ date, tot - ultimiOspedalizzati, tot ] );
         ultimiOspedalizzati = tot;
@@ -242,11 +235,12 @@ async function drawChartTrentino () {
         deceduti.push( [ date, parseInt( daily.deceduti ) - ultimiDeceduti, parseInt( daily.deceduti ) ] );
         ultimiDeceduti = parseInt( daily.deceduti );
 
-        guariti.push( [ date, parseInt( daily.guariti ) - ultimiDeceduti, parseInt( daily.guariti ) ] );
+        guariti.push( [ date, parseInt( daily.guariti ) - ultimiGuariti, parseInt( daily.guariti ) ] );
         ultimiGuariti = parseInt( daily.guariti );
+
     }
 
-    console.log( "Trentino", "nuovi dec.", deceduti );
+    //console.log( "Trentino", "nuovi dec.", deceduti );
 
     let header = document.querySelector( '#head-trentino' );
     let titleH1 = document.createElement( 'p' );
@@ -300,6 +294,11 @@ async function drawChartTrentino () {
     dataTag = 'guariti_trentino'
     draw( "Guariti. Dati APSS",
         fillDatesTable( [ "Incremento", "Totale" ], guariti, 2 ), dataTag, chartOptions, () => handleChartReady( 'guariti_trentino' ) );
+
+    chartOptions.colors = [ '#976393', '#685489' ];
+    dataTag = 'positivi_trentino';
+    draw( "Positivi. Dati APSS", fillDatesTable( [ "Incremento", "Totale" ], positivi, 2 ), dataTag, chartOptions, () => handleChartReady( 'positivi_trentino' ) );
+
 }
 
 async function drawChartComuni () {
