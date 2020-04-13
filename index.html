@@ -58,7 +58,11 @@
                         </template>
                         <template slot="option" slot-scope="option">
                             <div class="d-center">
-                                {{ option.text }}
+                                <p>{{ option.comune }} (
+                                <em>m</em>:<strong style="color: #e80e0e;">{{ option.m}}</strong>
+                                <em>g</em>:<strong style="color: #3ea85a;">{{ option.g}}</strong>
+                                <em>p</em>:<strong style="color: #976393;">{{ option.c}}</strong>
+                                )<p>
                             </div>
                         </template>
                         <template slot="selected-option" slot-scope="option">
@@ -67,16 +71,19 @@
                             </div>
                         </template>
                     </v-select>
-                    <input type="radio" value="m" v-model="picked">
-                    <label for="one">Ordinamento: Morti</label>
-                    <input type="radio" value="c" v-model="picked">
-                    <label for="two">Ordinamento: Contagiati</label>
+                    <input name="morti" type="radio" value="m" v-model="picked">
+                    <label for="morti">Ordinamento: Deceduti</label>
+                    <input name="guariti" type="radio" value="g" v-model="picked">
+                    <label for="guariti">Ordinamento: Guariti</label>
+                    <input name="contagiati" type="radio" value="c" v-model="picked">
+                    <label for="contagiati">Ordinamento: Positivi</label>
                 </div>
 
             </header>
             <article class="charts hero-body">
-                <h2 class="chart" id="comuni">&nbsp;</h2>
-                <h2 class="chart" id="comuni_deceduti">&nbsp;</h2>
+                <h2 class="chart" id="deceduti_comuni">&nbsp;</h2>
+                <h2 class="chart" id="guariti_comuni">&nbsp;</h2>
+                <h2 class="chart" id="positivi_comuni">&nbsp;</h2>
             </article>
         </section>
     </div>

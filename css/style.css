@@ -113,3 +113,15 @@ a:hover {
 .vs__selected {
     font-size: 0.7rem;
 }
+
+.morti {
+    color: #e80e0e;
+}
+
+.guariti {
+    color: #3ea85a;
+}
+
+.positivi {
+    color: #976393;
+}

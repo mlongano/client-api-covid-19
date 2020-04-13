@@ -47,7 +47,6 @@ function handleChartReady ( elementId ) {
 
 function extractInfo ( json ) {
     console.log("Italia json:", json);
-    let previous = json[ 0 ].nuovi_positivi;
     let ratios = [];
     let positivi = [];
     let nuovi_positivi = [];
@@ -58,18 +57,19 @@ function extractInfo ( json ) {
     let dimessi_guariti = [];
     let first = new Date( json[ 0 ].data ).getTime() / 86400000 - 18316;
     let last = first;
-    let ultimiDeceduti = 0;
-    let ultimiGuariti = 0;
-    let ultimiTamponi = 0;
-    let ultimiTerapia = 0;
-    let ultimiOspedalizzati = 0;
+    let ultimiPositivi = json[ 0 ].nuovi_positivi;
+    let ultimiDeceduti = json[ 0 ].deceduti;
+    let ultimiGuariti = json[ 0 ].dimessi_guariti;
+    let ultimiTamponi = json[ 0 ].tamponi;
+    let ultimiTerapia = json[ 0 ].terapia_intensiva;
+    let ultimiOspedalizzati = json[ 0 ].totale_ospedalizzati;
     let lastDateTime;
     for ( daily of json ) {
         lastDateTime = daily.data;
         let date = daily.data.split( " " )[ 0 ];
         //console.log( date );
-        let ratio = daily.nuovi_positivi / previous;
-        previous = daily.nuovi_positivi;
+        let ratio = daily.nuovi_positivi / ultimiPositivi;
+        ultimiPositivi = daily.nuovi_positivi;
         //console.log( daily );
         last = new Date( date );
         ratios.push( [ last, ratio ] );
@@ -308,12 +308,14 @@ async function drawChartComuni (selected) {
     let ratioList = [];
     let casesList = [];
     let deadsList = [];
+    let healedList = [];
     let before = 0;
     let data = json[ 0 ].cov19_data;
     data = Array.from( data );
     data.shift();
     let beforeDaily = 1;
     let deads = 0;
+    let healed = 0;
     let date;
     let idx;
     for ( day of json ) {
@@ -344,6 +346,11 @@ async function drawChartComuni (selected) {
             let last = cases[ idx + 2 ];
             deadsList.push( [ date, parseInt( last ) - parseInt( deads ), parseInt( last ) ] );
             deads = last;
+
+            let lastHealed = cases[ idx + 1 ];
+            healedList.push( [ date, parseInt( lastHealed ) - parseInt( healed ), parseInt( lastHealed ) ] );
+            healed = lastHealed;
+
         }
         beforeDaily = daily;
         before = comune;
@@ -386,15 +393,21 @@ async function drawChartComuni (selected) {
     }
     chartOptions.legend = { position: 'none' }
 
-    chartOptions.colors = [ '#976393', '#685489' ];
-    dataTag = 'comuni'
-    draw( "Totale positivi. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], casesList, 2 ), dataTag, chartOptions, () => handleChartReady( 'comuni' ) );
-
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
-    dataTag = 'comuni_deceduti'
+    dataTag = 'deceduti_comuni'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], deadsList, 2 ), dataTag, chartOptions, () => handleChartReady( 'comuni_deceduti' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], deadsList, 2 ), dataTag, chartOptions, () => handleChartReady( 'deceduti_comuni' ) );
+
+    chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
+    dataTag = 'guariti_comuni'
+    draw( "Guariti. Dati APSS",
+        fillDatesTable( [ "Incremento", "Totale" ], healedList, 2 ), dataTag, chartOptions, () => handleChartReady( 'guariti_comuni' ) );
+
+
+    chartOptions.colors = [ '#976393', '#685489' ];
+    dataTag = 'positivi_comuni'
+    draw( "Totale positivi. Dati APSS",
+        fillDatesTable( [ "Incremento", "Totale" ], casesList, 2 ), dataTag, chartOptions, () => handleChartReady( 'positivi_comuni' ) );
 
 }
 
