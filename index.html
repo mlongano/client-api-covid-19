@@ -59,15 +59,19 @@
                         <template slot="option" slot-scope="option">
                             <div class="d-center">
                                 <p>{{ option.comune }} (
-                                <em>m</em>:<strong style="color: #e80e0e;">{{ option.m}}</strong>
-                                <em>g</em>:<strong style="color: #3ea85a;">{{ option.g}}</strong>
-                                <em>p</em>:<strong style="color: #976393;">{{ option.c}}</strong>
+                                <em>m</em>:<strong style="color: #ff3860;">{{ option.m}}</strong>
+                                <em>g</em>:<strong style="color: #00d1b2;">{{ option.g}}</strong>
+                                <em>p</em>:<strong style="color: #3273dc;">{{ option.c}}</strong>
                                 )<p>
                             </div>
                         </template>
                         <template slot="selected-option" slot-scope="option">
                             <div class="selected d-center">
-                                {{ option.comune }}
+                                <p>{{ option.comune }} (
+                                <em>m</em>:<strong style="color: #ff3860;">{{ option.m}}</strong>
+                                <em>g</em>:<strong style="color: #00d1b2;">{{ option.g}}</strong>
+                                <em>p</em>:<strong style="color: #3273dc;">{{ option.c}}</strong>
+                                )<p>
                             </div>
                         </template>
                     </v-select>
