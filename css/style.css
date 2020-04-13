@@ -76,7 +76,6 @@ a:hover {
 }
 .v-select {
     width: var(--chart-width);
-    min-width: 370px;
 }
 
 .v-select .dropdown li {
