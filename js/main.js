@@ -7,7 +7,13 @@ var app = new Vue( {
         json: null,
         selected: null,
         options: [],
-        picked: 'm'
+        picked: 'm',
+        decedutiMva: false,
+        decedutiSpan: "7",
+        guaritiMva: false,
+        guaritiSpan: "7",
+        positiviMva: false,
+        positiviSpan: "7",
     },
     methods: {
         estraiOpzioni ( json, search, vm ) {
@@ -27,7 +33,7 @@ var app = new Vue( {
             //     "lat",
             //     "lon"
             // ]
-            let last = [...json[ json.length - 1 ].cov19_data];
+            let last = [ ...json[ json.length - 1 ].cov19_data ];
             let match = last.splice( 1 )
                 .filter( ( row ) => {
                     return row[ 1 ].search( re ) > -1;
@@ -47,12 +53,37 @@ var app = new Vue( {
         }, 350 ),
 
         drawComuni () {
-            google.charts.setOnLoadCallback( () => drawChartComuni( this.selected?.comune ) );
+            google.charts.setOnLoadCallback( () => drawChartComuni( this.selected?.comune, {
+                decedutiMva: this.decedutiMva,
+                decedutiSpan: parseInt( this.decedutiSpan ),
+                guaritiMva: this.guaritiMva,
+                guaritiSpan: parseInt( this.guaritiSpan ),
+                positiviMva: this.positiviMva,
+                positiviSpan: parseInt( this.positiviSpan ),
+            } ) );
         },
     },
 
     watch: {
         selected: { handler: 'drawComuni' },
+        decedutiMva: { handler: 'drawComuni' },
+        decedutiSpan () {
+            if ( this.decedutiMva ) {
+                this.drawComuni();
+            }
+        },
+        guaritiMva: { handler: 'drawComuni' },
+        guaritiSpan () {
+            if ( this.guaritiMva ) {
+                this.drawComuni();
+            }
+        },
+        positiviMva: { handler: 'drawComuni' },
+        positiviSpan () {
+            if ( this.positiviMva ) {
+                this.drawComuni();
+            }
+        },
         picked () {
             this.onSearch( "" )
         },
@@ -62,12 +93,12 @@ var app = new Vue( {
         fetch(
             this.dataUrl
         )
-            .then( res => res.json())
+            .then( res => res.json() )
             .then( json => {
                 this.json = json;
                 this.selected = this.estraiOpzioni( json, "ROVERETO", this )[ 0 ];
                 this.options = this.estraiOpzioni( json, "", this );
-            });
+            } );
         this.drawComuni();
     },
 

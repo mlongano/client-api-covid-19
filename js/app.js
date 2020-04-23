@@ -24,9 +24,26 @@ const elementsNazionali = {
     nazPosMva: document.querySelector( "#nazPosMva" ),
     nazPosSpan: document.querySelector( "#nazPosSpan" ),
 };
-
 for ( let el in elementsNazionali ) {
-    elementsNazionali[el].addEventListener( "change", handleItalyCharts, false );
+    elementsNazionali[ el ].addEventListener( "change", handleItalyCharts, false );
+}
+
+
+const elementsTrentino = {
+
+    trentOspMva: document.querySelector( "input[type='checkbox'][data-type='ospedalizzati']" ),
+    trentOspSpan: document.querySelector( "input[type='number'][data-type='ospedalizzati']" ),
+    trentIntMva: document.querySelector( "#trentIntMva" ),
+    trentIntSpan: document.querySelector( "#trentIntSpan" ),
+    trentDecMva: document.querySelector( "#trentDecMva" ),
+    trentDecSpan: document.querySelector( "#trentDecSpan" ),
+    trentGuaMva: document.querySelector( "#trentGuaMva" ),
+    trentGuaSpan: document.querySelector( "#trentGuaSpan" ),
+    trentPosMva: document.querySelector( "#trentPosMva" ),
+    trentPosSpan: document.querySelector( "#trentPosSpan" ),
+};
+for ( let el in elementsTrentino ) {
+    elementsTrentino[ el ].addEventListener( "change", handleTrentinoCharts, false );
 }
 
 
@@ -221,28 +238,39 @@ async function drawChartItaly ( {
 
     chartOptions.colors = [ '#FFAE25', '#C88005' ];
     dataTag = 'terapia_intensiva';
-    draw( "In terapia intensiva", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazIntMva, nazIntSpan  ), dataTag, chartOptions, () => handleChartReady( 'terapia_intensiva' ) );
+    draw( "In terapia intensiva", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazIntMva, nazIntSpan ), dataTag, chartOptions, () => handleChartReady( 'terapia_intensiva' ) );
 
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'deceduti';
-    draw( "Deceduti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazDecMva, nazDecSpan  ), dataTag, chartOptions, () => handleChartReady( 'deceduti' ) );
+    draw( "Deceduti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazDecMva, nazDecSpan ), dataTag, chartOptions, () => handleChartReady( 'deceduti' ) );
 
     chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
     dataTag = 'dimessi_guariti';
-    draw( "Dimessi guariti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazGuaMva, nazGuaSpan  ), dataTag, chartOptions, () => handleChartReady( 'dimessi_guariti' ) );
+    draw( "Dimessi guariti", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazGuaMva, nazGuaSpan ), dataTag, chartOptions, () => handleChartReady( 'dimessi_guariti' ) );
 
 
     chartOptions.colors = [ '#0012F2', '#0082F2' ];
     dataTag = 'tamponi';
-    draw( "Tamponi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazTamMva, nazTamSpan  ), dataTag, chartOptions, () => handleChartReady( 'tamponi' ) );
+    draw( "Tamponi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazTamMva, nazTamSpan ), dataTag, chartOptions, () => handleChartReady( 'tamponi' ) );
 
     chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'positivi';
-    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazPosMva, nazPosSpan  ), dataTag, chartOptions, () => handleChartReady( 'positivi' ) );
+    draw( "Positivi", fillDatesTable( [ "Incremento", "Totale" ], data[ dataTag ], nazPosMva, nazPosSpan ), dataTag, chartOptions, () => handleChartReady( 'positivi' ) );
 
 }
 
-async function drawChartTrentino () {
+async function drawChartTrentino ( {
+    trentOspMva = false,
+    trentOspSpan = 3,
+    trentIntMva = false,
+    trentIntSpan = 3,
+    trentDecMva = false,
+    trentDecSpan = 3,
+    trentGuaMva = false,
+    trentGuaSpan = 3,
+    trentPosMva = false,
+    trentPosSpan = 3,
+} = {} ) {
     //let res = await fetch( urlsDataTrentino.urlandamentocasi );
     //let csvString = await res.text();
     //const json = await csv().fromString( csvString );
@@ -297,10 +325,9 @@ async function drawChartTrentino () {
     //console.log( "Trentino", "nuovi dec.", deceduti );
 
     let header = document.querySelector( '#head-trentino' );
-    let titleH1 = document.createElement( 'p' );
+    let titleH1 = document.querySelector( '#head-trentino > p' );
     titleH1.textContent = `Ultimo aggiornamento ${date.toISOString().split( "T" )[ 0 ].split( "-" ).reverse().join( "/" )}`;
     titleH1.className = "lead subtitle";
-    header.appendChild( titleH1 );
 
     const chartOptions = {
         titleTextStyle: {
@@ -332,30 +359,38 @@ async function drawChartTrentino () {
     chartOptions.colors = [ '#c805b9', '#76056e' ];
     dataTag = 'ospedalizzati_trentino'
     draw( "   Ospedalizzati. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], ospedalizzati ), dataTag, chartOptions, () => handleChartReady( 'ospedalizzati_trentino' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], ospedalizzati, trentOspMva, trentOspSpan ), dataTag, chartOptions, () => handleChartReady( 'ospedalizzati_trentino' ) );
 
     chartOptions.colors = [ '#FFAE25', '#C88005' ];
     dataTag = 'terapia_intensiva_trentino'
     draw( "   In terapia intensiva/alta intensità. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], terapia_intensiva ), dataTag, chartOptions, () => handleChartReady( 'terapia_intensiva_trentino' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], terapia_intensiva, trentIntMva, trentIntSpan ), dataTag, chartOptions, () => handleChartReady( 'terapia_intensiva_trentino' ) );
 
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'deceduti_trentino'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], deceduti ), dataTag, chartOptions, () => handleChartReady( 'deceduti_trentino' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], deceduti, trentDecMva, trentDecSpan ), dataTag, chartOptions, () => handleChartReady( 'deceduti_trentino' ) );
 
     chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
     dataTag = 'guariti_trentino'
     draw( "Guariti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], guariti ), dataTag, chartOptions, () => handleChartReady( 'guariti_trentino' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], guariti, trentGuaMva, trentGuaSpan ), dataTag, chartOptions, () => handleChartReady( 'guariti_trentino' ) );
 
     chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'positivi_trentino';
-    draw( "Positivi. Dati APSS", fillDatesTable( [ "Incremento", "Totale" ], positivi ), dataTag, chartOptions, () => handleChartReady( 'positivi_trentino' ) );
+    draw( "Positivi. Dati APSS", fillDatesTable( [ "Incremento", "Totale" ], positivi, trentPosMva, trentPosSpan ), dataTag, chartOptions, () => handleChartReady( 'positivi_trentino' ) );
 
 }
 
-async function drawChartComuni ( selected ) {
+async function drawChartComuni ( selected, {
+    decedutiMva = false,
+    decedutiSpan = 3,
+    guaritiMva = false,
+    guaritiSpan = 3,
+    positiviMva = false,
+    positiviSpan = 3,
+} = {}
+) {
     let res = await fetch( window.location.origin + "/cov19-trentino.json" );
     let json = await res.json();
     const COMUNE = selected || "ROVERETO";
@@ -450,18 +485,18 @@ async function drawChartComuni ( selected ) {
     chartOptions.colors = [ '#e80e0e', '#B50000' ];
     dataTag = 'deceduti_comuni'
     draw( "Deceduti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], deadsList ), dataTag, chartOptions, () => handleChartReady( 'deceduti_comuni' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], deadsList, decedutiMva, decedutiSpan ), dataTag, chartOptions, () => handleChartReady( 'deceduti_comuni' ) );
 
     chartOptions.colors = [ '#55e57c', '#0f3b1b' ];
     dataTag = 'guariti_comuni'
     draw( "Guariti. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], healedList ), dataTag, chartOptions, () => handleChartReady( 'guariti_comuni' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], healedList, guaritiMva, guaritiSpan ), dataTag, chartOptions, () => handleChartReady( 'guariti_comuni' ) );
 
 
     chartOptions.colors = [ '#976393', '#685489' ];
     dataTag = 'positivi_comuni'
     draw( "Totale positivi. Dati APSS",
-        fillDatesTable( [ "Incremento", "Totale" ], casesList ), dataTag, chartOptions, () => handleChartReady( 'positivi_comuni' ) );
+        fillDatesTable( [ "Incremento", "Totale" ], casesList, positiviMva, positiviSpan ), dataTag, chartOptions, () => handleChartReady( 'positivi_comuni' ) );
 
 }
 
@@ -503,5 +538,20 @@ function handleItalyCharts () {
         nazTamSpan: parseInt( elementsNazionali.nazTamSpan.value ),
         nazPosMva: elementsNazionali.nazPosMva.checked,
         nazPosSpan: parseInt( elementsNazionali.nazPosSpan.value ),
+    } ) );
+}
+
+function handleTrentinoCharts () {
+    google.charts.setOnLoadCallback( () => drawChartTrentino( {
+        trentOspMva: elementsTrentino.trentOspMva.checked,
+        trentOspSpan: parseInt( elementsTrentino.trentOspSpan.value ),
+        trentIntMva: elementsTrentino.trentIntMva.checked,
+        trentIntSpan: parseInt( elementsTrentino.trentIntSpan.value ),
+        trentDecMva: elementsTrentino.trentDecMva.checked,
+        trentDecSpan: parseInt( elementsTrentino.trentDecSpan.value ),
+        trentGuaMva: elementsTrentino.trentGuaMva.checked,
+        trentGuaSpan: parseInt( elementsTrentino.trentGuaSpan.value ),
+        trentPosMva: elementsTrentino.trentPosMva.checked,
+        trentPosSpan: parseInt( elementsTrentino.trentPosSpan.value ),
     } ) );
 }

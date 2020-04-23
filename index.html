@@ -84,20 +84,57 @@
         <section class="hero is-primary is-bold">
             <header id="head-trentino" class="header hero-head">
                 <h1 class="title display-1">Dati del Trentino</h1>
+                <p>Ultimo aggiornamento</p>
+
             </header>
             <article class="charts hero-body">
-                <h2 class="chart" id="ospedalizzati_trentino">&nbsp;</h2>
-                <h2 class="chart" id="terapia_intensiva_trentino">&nbsp;</h2>
-                <h2 class="chart" id="deceduti_trentino">&nbsp;</h2>
-                <h2 class="chart" id="guariti_trentino">&nbsp;</h2>
-                <h2 class="chart" id="positivi_trentino">&nbsp;</h2>
+                <div>
+                    <input type="checkbox" data-type="ospedalizzati" name="trentOspMva" value="true" id="trentOspMva">
+                    <label for="trentOspMva">Media mobile - </label>
+                    <label for="trentOspSpan">numero di valori (3-30):</label>
+                    <input type="number" data-type="ospedalizzati" id="trentOspSpan" name="trentOspSpan" value="7"
+                        min="3" max="30" list="defaultSpan">
+                    <h2 class="chart" id="ospedalizzati_trentino">&nbsp;</h2>
+                </div>
+                <div>
+                    <input type="checkbox" data-type="intensiva" name="trentIntMva" value="true" id="trentIntMva">
+                    <label for="trentIntMva">Media mobile - </label>
+                    <label for="trentIntSpan">numero di valori (3-30):</label>
+                    <input type="number" data-type="intensiva" id="trentIntSpan" name="trentIntSpan" value="7" min="3"
+                        max="30" list="defaultSpan">
+                    <h2 class="chart" id="terapia_intensiva_trentino">&nbsp;</h2>
+                </div>
+                <div>
+                    <input type="checkbox" data-type="deceduti" name="trentDecMva" value="true" id="trentDecMva">
+                    <label for="trentDecMva">Media mobile - </label>
+                    <label for="trentDecSpan">numero di valori (3-30):</label>
+                    <input type="number" data-type="deceduti" id="trentDecSpan" name="trentDecSpan" value="7" min="3"
+                        max="30" list="defaultSpan">
+                    <h2 class="chart" id="deceduti_trentino">&nbsp;</h2>
+                </div>
+                <div>
+                    <input type="checkbox" data-type="guariti" name="trentGuaMva" value="true" id="trentGuaMva">
+                    <label for="trentGuaMva">Media mobile - </label>
+                    <label for="trentGuaSpan">numero di valori (3-30):</label>
+                    <input type="number" data-type="guariti" id="trentGuaSpan" name="trentGuaSpan" value="7" min="3"
+                        max="30" list="defaultSpan">
+                    <h2 class="chart" id="guariti_trentino">&nbsp;</h2>
+                </div>
+                <div>
+                    <input type="checkbox" data-type="positivi" name="trentPosMva" value="true" id="trentPosMva">
+                    <label for="trentPosMva">Media mobile - </label>
+                    <label for="trentPosSpan">numero di valori (3-30):</label>
+                    <input type="number" data-type="positivi" id="trentPosSpan" name="trentPosSpan" value="7" min="3"
+                        max="30" list="defaultSpan">
+                    <h2 class="chart" id="positivi_trentino">&nbsp;</h2>
+                </div>
             </article>
         </section>
         <section class="hero is-link is-bold">
-            <header id="head-comune" class="header hero-head">
-                <h1 class="title display-1">Dati di </h1>
-                <p>Ultimo aggiornamento</p>
-                <div id="vue">
+            <div id="vue">
+                <header id="head-comune" class="header hero-head">
+                    <h1 class="title display-1">Dati di </h1>
+                    <p>Ultimo aggiornamento</p>
                     <v-select label="comune" :filterable="true" :options="options" @search="onSearch"
                         v-model="selected">
                         <template #header>
@@ -131,14 +168,33 @@
                     <label for="guariti">Ordinamento: Guariti</label>
                     <input name="contagiati" type="radio" value="c" v-model="picked">
                     <label for="contagiati">Ordinamento: Positivi</label>
-                </div>
 
-            </header>
-            <article class="charts hero-body">
-                <h2 class="chart" id="deceduti_comuni">&nbsp;</h2>
-                <h2 class="chart" id="guariti_comuni">&nbsp;</h2>
-                <h2 class="chart" id="positivi_comuni">&nbsp;</h2>
-            </article>
+                </header>
+                <article class="charts hero-body">
+                    <div>
+                        <input type="checkbox" v-model="decedutiMva">
+                        <label>Media mobile - </label>
+                        <label>numero di valori (3-30):</label>
+                        <input type="number" value="7" min="3" max="30" v-model="decedutiSpan" list="defaultSpan">
+                        <h2 class="chart" id="deceduti_comuni">&nbsp;</h2>
+                    </div>
+                    <div>
+                        <input type="checkbox" v-model="guaritiMva">
+                        <label>Media mobile - </label>
+                        <label>numero di valori (3-30):</label>
+                        <input type="number" value="7" min="3" max="30" v-model="guaritiSpan" list="defaultSpan">
+                        <h2 class="chart" id="guariti_comuni">&nbsp;</h2>
+                    </div>
+                    <div>
+                        <input type="checkbox" v-model="positiviMva">
+                        <label>Media mobile - </label>
+                        <label>numero di valori (3-30):</label>
+                        <input type="number" value="7" min="3" max="30" v-model="positiviSpan" list="defaultSpan">
+                        <h2 class="chart" id="positivi_comuni">&nbsp;</h2>
+                    </div>
+                </article>
+            </div>
+
         </section>
     </div>
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
