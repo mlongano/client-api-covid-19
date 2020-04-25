@@ -1,12 +1,3 @@
-const COLORS = {
-    ospedalizzati: [ '#c805b9', '#76056e' ],
-    intensiva: [ '#FFAE25', '#C88005' ],
-    deceduti: [ '#e80e0e', '#B50000' ],
-    guariti: [ '#55e57c', '#0f3b1b' ],
-    tamponi: [ '#0012F2', '#0082F2' ],
-    positivi: [ '#976393', '#685489' ],
-}
-
 function loadComuniFactory ( url ) {
 
     let isComuniLoaded = false;
@@ -22,60 +13,17 @@ function loadComuniFactory ( url ) {
         return jsonComuni;
     }
 }
-class Chart {
-    constructor( {
-        title = "",
-        timeSeriesLabels = [],
-        timeSeriesTypes = [],
-        timeSeriesColors = [],
-        timeSeries = [], //a list of list of values
-        movingAveragedTimeSeries = [], //a list of list of moving averaged values
-        movingAverage = {
-            active: false,
-            range: 3,
-        },
-        movingAverageFunction = () => { throw new ReferenceError( `No moving average function defined for the object of type ${this.constructor.name} with the title "${this.title}"` ) },
-    } = {} ) {
-        this.title = title;
-        this.timeSeriesLabels = timeSeriesLabels;
-        this.timeSeriesTypes = timeSeriesTypes;
-        this.timeSeriesColors = timeSeriesColors;
-        this._timeSeries = timeSeries;
-        this.movingAveragedTimeSeries = movingAveragedTimeSeries;
-        this.movingAverage = movingAverage;
-        this.movingAverageFunction = movingAverageFunction;
-    }
-    get numberOfSeries () {
-        return this.timeSeriesLabels.length;
-    }
-
-    get timeSeries () {
-        if ( this.movingAverage.active ) {
-            return this.movingAverageFunction( this._timeSeries, this.movingAverage.range );
-        }
-        return this._timeSeries;
-    }
-    set timeSeries ( series ) {
-        if ( Array.isArray( series ) && Array.isArray( series[ 0 ] ) ) {
-            this._timeSeries = series;
-        } else {
-            throw new TypeError( `The "timeSeries" of the object of type ${this.constructor.name} with the title "${this.title}" is not an Array of Arrays` )
-        }
-    }
-
-}
-
-
 Vue.use( AsyncComputed );
 Vue.component( "v-select", VueSelect.VueSelect );
-var app = new Vue( {
-    el: '#vue',
+var chartsComuni = new Vue( {
+    el: '#chartsComuni',
     data: {
         dataUrl: `${window.location.origin}/cov19-trentino.json`,
         selected: null,
         json: null,
         options: [],
         picked: 'm',
+        lastDate: null,
         charts: [
             {
                 chart: new Chart( {
@@ -84,6 +32,7 @@ var app = new Vue( {
                     timeSeriesTypes: [ "date", "number", "number" ],
                     timeSeries: [ [] ],
                     timeSeriesColors: COLORS.deceduti,
+                    movingAverage: { active: false, range: 7 },
                     movingAverageFunction: mvaTimeSeries,
                 } ),
                 element: "deceduti_comuni",
@@ -95,6 +44,7 @@ var app = new Vue( {
                     timeSeriesTypes: [ "date", "number", "number" ],
                     timeSeries: [ [] ],
                     timeSeriesColors: COLORS.guariti,
+                    movingAverage: { active: false, range: 7 },
                     movingAverageFunction: mvaTimeSeries,
                 } ),
                 element: "guariti_comuni",
@@ -106,6 +56,7 @@ var app = new Vue( {
                     timeSeriesTypes: [ "date", "number", "number" ],
                     timeSeries: [ [] ],
                     timeSeriesColors: COLORS.positivi,
+                    movingAverage: { active: false, range: 7 },
                     movingAverageFunction: mvaTimeSeries,
                 } ),
                 element: "positivi_comuni",
@@ -193,7 +144,7 @@ var app = new Vue( {
                 casesList.push( [ date, daily, positivi ] );
                 //console.log( date, total );
             }
-
+            this.lastDate = date.toISOString().split( "T" )[ 0 ].split( "-" ).reverse().join( "/" );
             this.charts[ 0 ].chart.timeSeries = deadsList;
             this.charts[ 1 ].chart.timeSeries = healedList;
             this.charts[ 2 ].chart.timeSeries = casesList;
@@ -212,7 +163,7 @@ var app = new Vue( {
         },
 
         onMovingAverageActiveChanged ( chart ) {
-            this.drawChartComuni(  chart.chart, chart.element );
+            this.drawChartComuni( chart.chart, chart.element );
         },
         onMovingAverageRangeChanged ( chart ) {
             if ( chart.chart.movingAverage.active ) {
@@ -262,4 +213,4 @@ var app = new Vue( {
 
     },
 
-} )
+} );

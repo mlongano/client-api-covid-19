@@ -24,117 +24,51 @@
             <option value="30">
         </datalist>
         <section class="hero is-info is-bold">
-            <header id="head-nazionali" class="header hero-head">
-                <h1 class="title display-1">Dati Nazionali</h1>
-                <p>Ultimo aggiornamento</p>
+            <div id="chartsNazionali">
 
-            </header>
-            <article class="charts hero-body">
-                <div>
-                    <input type="checkbox" name="nazOspMva" value="true" id="nazOspMva">
-                    <label for="nazOspMva">Media mobile - </label>
-                    <label for="nazOspSpan">numero di valori (3-30):</label>
-                    <input type="number" id="nazOspSpan" name="nazOspSpan" value="7" min="3" max="30"
-                        list="defaultSpan">
+                <header id="head-nazionali" class="header hero-head">
+                    <h1 class="title display-1">Dati Nazionali</h1>
+                    <p class="lead subtitle">Ultimo aggiornamento {{ lastDate }}</p>
 
-                    <h2 class="chart" id="ospedalizzati">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" name="nazIntMva" value="true" id="nazIntMva">
-                    <label for="nazIntMva">Media mobile - </label>
-                    <label for="nazIntSpan">numero di valori (3-30):</label>
-                    <input type="number" id="nazIntSpan" name="nazIntSpan" value="7" min="3" max="30"
-                        list="defaultSpan">
-                    <h2 class="chart" id="terapia_intensiva">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" name="nazDecMva" value="true" id="nazDecMva">
-                    <label for="nazDecMva">Media mobile - </label>
-                    <label for="nazDecSpan">numero di valori (3-30):</label>
-                    <input type="number" id="nazDecSpan" name="nazDecSpan" value="7" min="3" max="30"
-                        list="defaultSpan">
-                    <h2 class="chart" id="deceduti">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" name="nazGuaMva" value="true" id="nazGuaMva">
-                    <label for="nazGuaMva">Media mobile - </label>
-                    <label for="nazGuaSpan">numero di valori (3-30):</label>
-                    <input type="number" id="nazGuaSpan" name="nazGuaSpan" value="7" min="3" max="30"
-                        list="defaultSpan">
-                    <h2 class="chart" id="dimessi_guariti">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" name="nazTamMva" value="true" id="nazTamMva">
-                    <label for="nazTamMva">Media mobile - </label>
-                    <label for="nazTamSpan">numero di valori (3-30):</label>
-                    <input type="number" id="nazTamSpan" name="nazTamSpan" value="7" min="3" max="30"
-                        list="defaultSpan">
-                    <h2 class="chart" id="tamponi">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" name="nazPosMva" value="true" id="nazPosMva">
-                    <label for="nazPosMva">Media mobile - </label>
-                    <label for="nazPosSpan">numero di valori (3-30):</label>
-                    <input type="number" id="nazPosSpan" name="nazPosSpan" value="7" min="3" max="30"
-                        list="defaultSpan">
-                    <h2 class="chart" id="positivi">&nbsp;</h2>
-                </div>
-            </article>
+                </header>
+                <article class="charts hero-body">
+                    <div v-for="(chart,index) in charts" :key="index">
+                        <input type="checkbox" v-model="charts[index].chart.movingAverage.active">
+                        <label>Media mobile - </label>
+                        <label>numero di valori (3-30):</label>
+                        <input type="number" value="7" min="3" max="30"
+                            v-model="charts[index].chart.movingAverage.range" list="defaultSpan">
+                        <h2 class="chart" :id="charts[index].element">&nbsp;</h2>
+
+                    </div>
+                </article>
+            </div>
         </section>
         <section class="hero is-primary is-bold">
-            <header id="head-trentino" class="header hero-head">
-                <h1 class="title display-1">Dati del Trentino</h1>
-                <p>Ultimo aggiornamento</p>
+            <div id="chartsTrentino">
 
-            </header>
-            <article class="charts hero-body">
-                <div>
-                    <input type="checkbox" data-type="ospedalizzati" name="trentOspMva" value="true" id="trentOspMva">
-                    <label for="trentOspMva">Media mobile - </label>
-                    <label for="trentOspSpan">numero di valori (3-30):</label>
-                    <input type="number" data-type="ospedalizzati" id="trentOspSpan" name="trentOspSpan" value="7"
-                        min="3" max="30" list="defaultSpan">
-                    <h2 class="chart" id="ospedalizzati_trentino">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" data-type="intensiva" name="trentIntMva" value="true" id="trentIntMva">
-                    <label for="trentIntMva">Media mobile - </label>
-                    <label for="trentIntSpan">numero di valori (3-30):</label>
-                    <input type="number" data-type="intensiva" id="trentIntSpan" name="trentIntSpan" value="7" min="3"
-                        max="30" list="defaultSpan">
-                    <h2 class="chart" id="terapia_intensiva_trentino">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" data-type="deceduti" name="trentDecMva" value="true" id="trentDecMva">
-                    <label for="trentDecMva">Media mobile - </label>
-                    <label for="trentDecSpan">numero di valori (3-30):</label>
-                    <input type="number" data-type="deceduti" id="trentDecSpan" name="trentDecSpan" value="7" min="3"
-                        max="30" list="defaultSpan">
-                    <h2 class="chart" id="deceduti_trentino">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" data-type="guariti" name="trentGuaMva" value="true" id="trentGuaMva">
-                    <label for="trentGuaMva">Media mobile - </label>
-                    <label for="trentGuaSpan">numero di valori (3-30):</label>
-                    <input type="number" data-type="guariti" id="trentGuaSpan" name="trentGuaSpan" value="7" min="3"
-                        max="30" list="defaultSpan">
-                    <h2 class="chart" id="guariti_trentino">&nbsp;</h2>
-                </div>
-                <div>
-                    <input type="checkbox" data-type="positivi" name="trentPosMva" value="true" id="trentPosMva">
-                    <label for="trentPosMva">Media mobile - </label>
-                    <label for="trentPosSpan">numero di valori (3-30):</label>
-                    <input type="number" data-type="positivi" id="trentPosSpan" name="trentPosSpan" value="7" min="3"
-                        max="30" list="defaultSpan">
-                    <h2 class="chart" id="positivi_trentino">&nbsp;</h2>
-                </div>
-            </article>
+                <header id="head-trentino" class="header hero-head">
+                    <h1 class="title display-1">Dati del Trentino</h1>
+                    <p class="lead subtitle">Ultimo aggiornamento {{ lastDate }}</p>
+                </header>
+                <article class="charts hero-body">
+                    <div v-for="(chart,index) in charts" :key="index">
+                        <input type="checkbox" v-model="charts[index].chart.movingAverage.active">
+                        <label>Media mobile - </label>
+                        <label>numero di valori (3-30):</label>
+                        <input type="number" value="7" min="3" max="30"
+                            v-model="charts[index].chart.movingAverage.range" list="defaultSpan">
+                        <h2 class="chart" :id="charts[index].element">&nbsp;</h2>
+
+                    </div>
+                </article>
+            </div>
         </section>
         <section class="hero is-link is-bold">
-            <div id="vue">
+            <div id="chartsComuni">
                 <header id="head-comune" class="header hero-head">
                     <h1 class="title display-1">Dati di {{ selected?.comune }}</h1>
-                    <p>Ultimo aggiornamento</p>
+                    <p class="lead subtitle">Ultimo aggiornamento {{ lastDate }}</p>
                     <v-select label="comune" :filterable="true" :options="options" @search="onSearch"
                         v-model="selected">
                         <template #header>
@@ -199,7 +133,10 @@
     <script src="https://unpkg.com/lodash@latest/lodash.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/Chart.js"></script>
+    <script src="js/chartNazionali.js"></script>
+    <script src="js/chartTrentino.js"></script>
+    <script src="js/chartComuni.js"></script>
 </body>
 
 </html>
