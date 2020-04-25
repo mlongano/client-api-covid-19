@@ -133,7 +133,7 @@
         <section class="hero is-link is-bold">
             <div id="vue">
                 <header id="head-comune" class="header hero-head">
-                    <h1 class="title display-1" v-model="selected">Dati di {{ selected.comune }}</h1>
+                    <h1 class="title display-1">Dati di {{ selected?.comune }}</h1>
                     <p>Ultimo aggiornamento</p>
                     <v-select label="comune" :filterable="true" :options="options" @search="onSearch"
                         v-model="selected">
@@ -162,21 +162,28 @@
                             </div>
                         </template>
                     </v-select>
-                    <input name="morti" type="radio" value="m" v-model="picked">
-                    <label for="morti">Ordinamento: Deceduti</label>
-                    <input name="guariti" type="radio" value="g" v-model="picked">
-                    <label for="guariti">Ordinamento: Guariti</label>
-                    <input name="contagiati" type="radio" value="c" v-model="picked">
-                    <label for="contagiati">Ordinamento: Positivi</label>
+                    <span>Ordinamento: </span>
+                    <label>
+                        <input name="ordinamento" type="radio" value="m" v-model="picked">
+                        Deceduti
+                    </label>
+                    <label>
+                        <input name="ordinamento" type="radio" value="g" v-model="picked">
+                        Guariti
+                    </label>
+                    <label>
+                        <input name="ordinamento" type="radio" value="c" v-model="picked">
+                        Positivi
+                    </label>
 
                 </header>
                 <article class="charts hero-body">
-                    <div v-for="(chart,index) in charts" :key="index" >
+                    <div v-for="(chart,index) in charts" :key="index">
                         <input type="checkbox" v-model="charts[index].chart.movingAverage.active">
                         <label>Media mobile - </label>
                         <label>numero di valori (3-30):</label>
-                        <input type="number" value="7" min="3" max="30" v-model="charts[index].chart.movingAverage.range"
-                            list="defaultSpan">
+                        <input type="number" value="7" min="3" max="30"
+                            v-model="charts[index].chart.movingAverage.range" list="defaultSpan">
                         <h2 class="chart" :id="charts[index].element">&nbsp;</h2>
 
                     </div>
