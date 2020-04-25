@@ -22,7 +22,7 @@ var chartsComuni = new Vue( {
         selected: null,
         json: null,
         options: [],
-        picked: 'm',
+        ordinamentoComuni: 'm',
         lastDate: null,
         charts: [
             {
@@ -89,7 +89,7 @@ var chartsComuni = new Vue( {
                 } )
                 .map( ( row ) => ( { id: row[ 0 ], comune: row[ 1 ], text: `${row[ 1 ]} (c:${row[ 2 ]}, m:${row[ 4 ]}, g:${row[ 3 ]})`, c: row[ 2 ], m: row[ 4 ], g: row[ 3 ] } ) );
             console.log( "VUE", match );
-            return match.sort( ( a, b ) => ( parseInt( b[ vm.picked ] ) - parseInt( a[ vm.picked ] ) ) );
+            return match.sort( ( a, b ) => ( parseInt( b[ vm.ordinamentoComuni ] ) - parseInt( a[ vm.ordinamentoComuni ] ) ) );
         },
         extractCumuneTimeSeries ( json, comune = "ROVERETO" ) {
             comune = comune || "ROVERETO";
@@ -183,7 +183,7 @@ var chartsComuni = new Vue( {
                     }
                 } );
         },
-        picked () {
+        ordinamentoComuni () {
             this.onSearch( "" )
         },
     },
