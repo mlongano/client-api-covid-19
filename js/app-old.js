@@ -2,7 +2,7 @@ const getData = () => {
     //return fetch( "https://coronavirus-tracker-api.herokuapp.com/all" );
     return fetch( "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale.json" );
 }
-function drawChart ( data, element ) {
+/* function drawChart ( data, element ) {
     return () => {
         let options = {
             title: "Rapporto dell'incremento del giorno rispetto a quello del giorno prima",
@@ -23,7 +23,7 @@ function drawChart ( data, element ) {
         console.log(options);
     }
 }
-
+ */
 getData()
     .then( res => res.json() )
     .then( json => {

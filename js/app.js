@@ -66,6 +66,16 @@ function draw ( title, data, element, options, readyHandler = ( () => { } ) ) {
     chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
 }
 
+function draw1 ( title, data, element, options, readyHandler = ( () => { } ) ) {
+    options.title = title;
+    const chartMaterial = new google.charts.Line( document.getElementById( element ) );
+    //chart.draw( data, options );
+    google.visualization.events.addListener( chartMaterial, 'ready', readyHandler );
+
+    chartMaterial.draw( data, google.charts.Line.convertOptions( options ) );
+}
+
+
 function handleChartReady ( elementId ) {
     let titles = document.querySelectorAll( "#" + elementId + " svg defs+g rect+text" );
     let chart = document.querySelector( ".chart" );
@@ -145,6 +155,16 @@ function extractInfo ( json ) {
         ospedalizzati: ospedalizzati,
     }
 
+}
+
+function fillDatesTable1 ( types, titles, series ) {
+    let table = new google.visualization.DataTable();
+    table.addColumn( types[ 0 ], titles[ 0 ] );
+    for (let index = 1; index < types.length; index++) {
+        table.addColumn( types[ index ], titles[ index ] );
+    }
+    table.addRows( series );
+    return table;
 }
 
 function fillDatesTable ( titles, list, useMva = false, span = 3 ) {
@@ -381,6 +401,48 @@ async function drawChartTrentino ( {
     draw( "Positivi. Dati APSS", fillDatesTable( [ "Incremento", "Totale" ], positivi, trentPosMva, trentPosSpan ), dataTag, chartOptions, () => handleChartReady( 'positivi_trentino' ) );
 
 }
+
+
+
+/**
+ * @param  { Chart } `chart` Chart object containing all the information for drawing the chart.
+ * @param  {String} `htmlElement` element.
+ * @return { Null }
+ * @api public
+ */
+function drawChart (chart, htmlElement) {
+    const chartOptions = {
+        titlePosition: "out",
+        titleTextStyle: {
+            color: "#888",
+            fontName: 'BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif',
+            fontSize: 22,
+            bold: false,
+            italic: false
+        },
+        hAxis: {
+            title: chart.timeSeriesLabels[ 0 ],
+        },
+    };
+
+    chartOptions.series = {
+        // Gives each series an axis name that matches the Y-axis below.
+        0: { axis: 'nuovi' },
+        1: { axis: 'totale' }
+    };
+    chartOptions.axes = {
+        // Adds labels to each axis; they don't have to match the axis names.
+        y: {
+            nuovi: { label: chart.timeSeriesLabels[ 1 ] },
+            totale: { label: chart.timeSeriesLabels[ 2 ] }
+        }
+    }
+    chartOptions.legend = { position: 'none' }
+    chartOptions.colors = chart.timeSeriesColors;
+    draw( chart.title,
+        fillDatesTable1(chart.timeSeriesTypes, chart.timeSeriesLabels,  chart.timeSeries), htmlElement, chartOptions, () => handleChartReady( htmlElement ) );
+}
+
 
 async function drawChartComuni ( selected, {
     decedutiMva = false,

@@ -172,6 +172,14 @@
                 </header>
                 <article class="charts hero-body">
                     <div>
+                        <input type="checkbox" v-model="deceduti1Mva">
+                        <label>Media mobile - </label>
+                        <label>numero di valori (3-30):</label>
+                        <input type="number" value="7" min="3" max="30" v-model="deceduti1Span" list="defaultSpan">
+                        <h2 class="chart" id="deceduti1_comuni">&nbsp;</h2>
+                    </div>
+
+                    <div>
                         <input type="checkbox" v-model="decedutiMva">
                         <label>Media mobile - </label>
                         <label>numero di valori (3-30):</label>
@@ -208,6 +216,7 @@
     </script> -->
     <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-async-computed"></script>
     <script src="https://unpkg.com/vue-select@latest"></script>
     <script src="https://unpkg.com/lodash@latest/lodash.min.js"></script>
     <script src="js/utils.js"></script>

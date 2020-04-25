@@ -1,24 +1,24 @@
 
 function compareValues ( key, order = 'asc' ) {
-  return function innerSort(a, b) {
-    if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+  return function innerSort ( a, b ) {
+    if ( !a.hasOwnProperty( key ) || !b.hasOwnProperty( key ) ) {
       // property doesn't exist on either object
       return 0;
     }
 
-    const varA = (typeof a[key] === 'string')
-      ? a[key].toUpperCase() : a[key];
-    const varB = (typeof b[key] === 'string')
-      ? b[key].toUpperCase() : b[key];
+    const varA = ( typeof a[ key ] === 'string' )
+      ? a[ key ].toUpperCase() : a[ key ];
+    const varB = ( typeof b[ key ] === 'string' )
+      ? b[ key ].toUpperCase() : b[ key ];
 
     let comparison = 0;
-    if (varA > varB) {
+    if ( varA > varB ) {
       comparison = 1;
-    } else if (varA < varB) {
+    } else if ( varA < varB ) {
       comparison = -1;
     }
     return (
-      (order === 'desc') ? (comparison * -1) : comparison
+      ( order === 'desc' ) ? ( comparison * -1 ) : comparison
     );
   };
 }
@@ -108,7 +108,7 @@ function toFixed ( n ) {
  * @return {Number} `idx` if idxmin <= idx <= idxmax otherwise idxmin or idxmax
  */
 
-function validIndex ( idx, idxmax = Infinity, idxmin = 0) {
+function validIndex ( idx, idxmax = Infinity, idxmin = 0 ) {
   //console.log(x,xmax)
   if ( idx < idxmin )
     return idxmin
@@ -135,9 +135,9 @@ function validIndex ( idx, idxmax = Infinity, idxmin = 0) {
  * //=>   │      └─(1+2+3+4)/5
  * //=>   └─(1+2+3)/5
  * ```
- * @param  {Array} `data` Array of numbers to calculate.
- * @param  {Number} `span` Size of the window to use to when calculating the average for each range. Defaults to 3.
- * @return {Array} Resulting array of averages.
+ * @param  {Array} `data` Array of numbers to compute moving average.
+ * @param  {Number} `span` Size of the window to use to when calculating the moving average. Defaults to 3.
+ * @return {Array} Resulting array of moving averages.
  * @api public
  */
 function mva ( data, span = 3 ) {
@@ -145,9 +145,35 @@ function mva ( data, span = 3 ) {
   let ksup = parseInt( ( span - 1 ) / 2 + 1.5 );
   let dataAveraged = [];
   for ( let i = 0; i < data.length; i++ ) {
-    let range = data.slice( validIndex( i - kinf), validIndex( i + ksup,data.length ) );
+    let range = data.slice( validIndex( i - kinf ), validIndex( i + ksup, data.length ) );
     let avg = range.reduce( ( a, b ) => a + b, 0 ) / range.length
     dataAveraged.push( avg );
   }
   return dataAveraged;
+}
+
+/**
+ * @param  { Array } `timeSeries` Array of arrays. The first element of each array is the date, the remaining values are the data to compute moving average.
+ * @param  {Number} `span` Size of the window to use to when calculating the moving average. Defaults to 3.
+ * @return { Array } Resulting array of arrays of moving averages.
+ * @api public
+ */
+function mvaTimeSeries ( timeSeries, span = 3 ) {
+  if ( Array.isArray( timeSeries ) && Array.isArray( timeSeries[0] ) ) {
+    let date = timeSeries.map( d => d[ 0 ] );
+    let columns = [];
+    let newtimeSeries = [];
+    for ( let i = 1; i < timeSeries[ 0 ].length; i++ ) {
+      columns[ i - 1 ] = mva( timeSeries.map( d => d[ i ] ), span );
+    }
+    for ( let i = 0; i < timeSeries.length; i++ ) {
+      let row = []
+      for ( let k = 1; k < timeSeries[ 0 ].length; k++ ) {
+        row.push( columns[ k - 1 ][ i ] );
+      }
+      newtimeSeries.push( [ date[ i ], ...row ] );
+    }
+    return newtimeSeries;
+  }
+  throw new TypeError('The parameter "timeSeries" of the function "mvaTimeSeries" is not an Array of Arrays');
 }
