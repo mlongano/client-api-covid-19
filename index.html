@@ -133,7 +133,7 @@
         <section class="hero is-link is-bold">
             <div id="vue">
                 <header id="head-comune" class="header hero-head">
-                    <h1 class="title display-1">Dati di </h1>
+                    <h1 class="title display-1" v-model="selected">Dati di {{ selected.comune }}</h1>
                     <p>Ultimo aggiornamento</p>
                     <v-select label="comune" :filterable="true" :options="options" @search="onSearch"
                         v-model="selected">
@@ -171,49 +171,20 @@
 
                 </header>
                 <article class="charts hero-body">
-                    <div>
-                        <input type="checkbox" v-model="deceduti1Mva">
+                    <div v-for="(chart,index) in charts" :key="index" >
+                        <input type="checkbox" v-model="charts[index].chart.movingAverage.active">
                         <label>Media mobile - </label>
                         <label>numero di valori (3-30):</label>
-                        <input type="number" value="7" min="3" max="30" v-model="deceduti1Span" list="defaultSpan">
-                        <h2 class="chart" id="deceduti1_comuni">&nbsp;</h2>
-                    </div>
+                        <input type="number" value="7" min="3" max="30" v-model="charts[index].chart.movingAverage.range"
+                            list="defaultSpan">
+                        <h2 class="chart" :id="charts[index].element">&nbsp;</h2>
 
-                    <div>
-                        <input type="checkbox" v-model="decedutiMva">
-                        <label>Media mobile - </label>
-                        <label>numero di valori (3-30):</label>
-                        <input type="number" value="7" min="3" max="30" v-model="decedutiSpan" list="defaultSpan">
-                        <h2 class="chart" id="deceduti_comuni">&nbsp;</h2>
-                    </div>
-                    <div>
-                        <input type="checkbox" v-model="guaritiMva">
-                        <label>Media mobile - </label>
-                        <label>numero di valori (3-30):</label>
-                        <input type="number" value="7" min="3" max="30" v-model="guaritiSpan" list="defaultSpan">
-                        <h2 class="chart" id="guariti_comuni">&nbsp;</h2>
-                    </div>
-                    <div>
-                        <input type="checkbox" v-model="positiviMva">
-                        <label>Media mobile - </label>
-                        <label>numero di valori (3-30):</label>
-                        <input type="number" value="7" min="3" max="30" v-model="positiviSpan" list="defaultSpan">
-                        <h2 class="chart" id="positivi_comuni">&nbsp;</h2>
                     </div>
                 </article>
             </div>
 
         </section>
     </div>
-    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
-    </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
-    </script> -->
     <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-async-computed"></script>

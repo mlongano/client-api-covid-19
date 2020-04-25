@@ -1,8 +1,13 @@
 const COLORS = {
+    ospedalizzati: [ '#c805b9', '#76056e' ],
+    intensiva: [ '#FFAE25', '#C88005' ],
     deceduti: [ '#e80e0e', '#B50000' ],
+    guariti: [ '#55e57c', '#0f3b1b' ],
+    tamponi: [ '#0012F2', '#0082F2' ],
+    positivi: [ '#976393', '#685489' ],
 }
 
-function loadComuniFactory (url) {
+function loadComuniFactory ( url ) {
 
     let isComuniLoaded = false;
     let jsonComuni = {};
@@ -11,7 +16,7 @@ function loadComuniFactory (url) {
         if ( isComuniLoaded ) {
             return jsonComuni;
         }
-        let res = await fetch( url);
+        let res = await fetch( url );
         jsonComuni = await res.json();
         isComuniLoaded = true;
         return jsonComuni;
@@ -60,65 +65,6 @@ class Chart {
 
 }
 
-function extractCumuneTimeSeries ( json, comune = "ROVERETO" ) {
-    comune = comune || "ROVERETO";
-    let casesList = [];
-    let deadsList = [];
-    let healedList = [];
-    let before = 0;
-    let data = json[ json.length - 1 ].cov19_data;
-    //data = Array.from( data );
-    data.shift();
-    let beforeDaily = 1;
-    let deads = 0;
-    let healed = 0;
-    let date;
-    let idx;
-    for ( day of json ) {
-        date = new Date( day.date );
-        data = day.cov19_data;
-        //console.log(COMUNE,"Dati:",  data);
-
-        if ( data[ 0 ][ 0 ] === "Lat" ) {
-            idx = 3;
-        } else if ( data[ 0 ][ 0 ] === "codice" ) {
-            idx = 2;
-        } else {
-            idx = 1;
-        }
-        //console.log(idx);
-        let cases = data.filter( ( row ) => {
-            return row[ idx - 1 ] === comune;
-        } )[ 0 ];
-        if ( !cases ) {
-            continue;
-        }
-        data.shift();
-        let positivi = parseInt( cases[ idx ] );
-        let daily = positivi - before;
-        let ratio = daily / beforeDaily;
-        //console.log( COMUNE, date, ratio, daily, beforeDaily );
-        if ( idx === 2 ) {
-            let last = cases[ idx + 2 ];
-            deadsList.push( [ date, parseInt( last ) - parseInt( deads ), parseInt( last ) ] );
-            deads = last;
-
-            let lastHealed = cases[ idx + 1 ];
-            healedList.push( [ date, parseInt( lastHealed ) - parseInt( healed ), parseInt( lastHealed ) ] );
-            healed = lastHealed;
-
-        }
-        beforeDaily = daily;
-        before = positivi;
-        casesList.push( [ date, daily, positivi ] );
-        //console.log( date, total );
-    }
-    return {
-        deceduti: deadsList,
-        guariti: healedList,
-        positivi: casesList,
-    };
-}
 
 Vue.use( AsyncComputed );
 Vue.component( "v-select", VueSelect.VueSelect );
@@ -128,25 +74,43 @@ var app = new Vue( {
         dataUrl: `${window.location.origin}/cov19-trentino.json`,
         selected: null,
         json: null,
-        json1: null,
         options: [],
         picked: 'm',
-        decedutiMva: false,
-        decedutiSpan: "7",
-        deceduti1Mva: false,
-        deceduti1Span: "7",
-        guaritiMva: false,
-        guaritiSpan: "7",
-        positiviMva: false,
-        positiviSpan: "7",
-        decedutiChart: new Chart( {
-            title: "Deceduti",
-            timeSeriesLabels: [ "Data", "Incremento", "Totale" ],
-            timeSeriesTypes: [ "date", "number", "number" ],
-            timeSeries: [ [] ],
-            timeSeriesColors: COLORS.deceduti,
-            movingAverageFunction: mvaTimeSeries,
-        } )
+        charts: [
+            {
+                chart: new Chart( {
+                    title: "Deceduti",
+                    timeSeriesLabels: [ "Data", "Incremento", "Totale" ],
+                    timeSeriesTypes: [ "date", "number", "number" ],
+                    timeSeries: [ [] ],
+                    timeSeriesColors: COLORS.deceduti,
+                    movingAverageFunction: mvaTimeSeries,
+                } ),
+                element: "deceduti_comuni",
+            },
+            {
+                chart: new Chart( {
+                    title: "Guariti",
+                    timeSeriesLabels: [ "Data", "Incremento", "Totale" ],
+                    timeSeriesTypes: [ "date", "number", "number" ],
+                    timeSeries: [ [] ],
+                    timeSeriesColors: COLORS.guariti,
+                    movingAverageFunction: mvaTimeSeries,
+                } ),
+                element: "guariti_comuni",
+            },
+            {
+                chart: new Chart( {
+                    title: "Positivi",
+                    timeSeriesLabels: [ "Data", "Incremento", "Totale" ],
+                    timeSeriesTypes: [ "date", "number", "number" ],
+                    timeSeries: [ [] ],
+                    timeSeriesColors: COLORS.positivi,
+                    movingAverageFunction: mvaTimeSeries,
+                } ),
+                element: "positivi_comuni",
+            },
+        ],
     },
 
     methods: {
@@ -176,6 +140,64 @@ var app = new Vue( {
             console.log( "VUE", match );
             return match.sort( ( a, b ) => ( parseInt( b[ vm.picked ] ) - parseInt( a[ vm.picked ] ) ) );
         },
+        extractCumuneTimeSeries ( json, comune = "ROVERETO" ) {
+            comune = comune || "ROVERETO";
+            let casesList = [];
+            let deadsList = [];
+            let healedList = [];
+            let before = 0;
+            let data = json[ json.length - 1 ].cov19_data;
+            //data = Array.from( data );
+            data.shift();
+            let beforeDaily = 1;
+            let deads = 0;
+            let healed = 0;
+            let date;
+            let idx;
+            for ( day of json ) {
+                date = new Date( day.date );
+                data = day.cov19_data;
+                //console.log(COMUNE,"Dati:",  data);
+
+                if ( data[ 0 ][ 0 ] === "Lat" ) {
+                    idx = 3;
+                } else if ( data[ 0 ][ 0 ] === "codice" ) {
+                    idx = 2;
+                } else {
+                    idx = 1;
+                }
+                //console.log(idx);
+                let cases = data.filter( ( row ) => {
+                    return row[ idx - 1 ] === comune;
+                } )[ 0 ];
+                if ( !cases ) {
+                    continue;
+                }
+                data.shift();
+                let positivi = parseInt( cases[ idx ] );
+                let daily = positivi - before;
+                let ratio = daily / beforeDaily;
+                //console.log( COMUNE, date, ratio, daily, beforeDaily );
+                if ( idx === 2 ) {
+                    let last = cases[ idx + 2 ];
+                    deadsList.push( [ date, parseInt( last ) - parseInt( deads ), parseInt( last ) ] );
+                    deads = last;
+
+                    let lastHealed = cases[ idx + 1 ];
+                    healedList.push( [ date, parseInt( lastHealed ) - parseInt( healed ), parseInt( lastHealed ) ] );
+                    healed = lastHealed;
+
+                }
+                beforeDaily = daily;
+                before = positivi;
+                casesList.push( [ date, daily, positivi ] );
+                //console.log( date, total );
+            }
+
+            this.charts[ 0 ].chart.timeSeries = deadsList;
+            this.charts[ 1 ].chart.timeSeries = healedList;
+            this.charts[ 2 ].chart.timeSeries = casesList;
+        },
 
         onSearch ( search, loading ) {
             loading && loading( true );
@@ -185,60 +207,30 @@ var app = new Vue( {
             vm.options = vm.estraiOpzioni( vm.json, search, vm );
             loading && loading( false );
         }, 350 ),
-
-        drawComuni () {
-            google.charts.setOnLoadCallback( () => drawChartComuni( this.selected?.comune, {
-                decedutiMva: this.decedutiMva,
-                decedutiSpan: parseInt( this.decedutiSpan ),
-                guaritiMva: this.guaritiMva,
-                guaritiSpan: parseInt( this.guaritiSpan ),
-                positiviMva: this.positiviMva,
-                positiviSpan: parseInt( this.positiviSpan ),
-            } ) );
-
+        drawChartComuni ( chart, element ) {
+            google.charts.setOnLoadCallback( () => drawChart( chart, element ) );
         },
-        drawChartComuni (chart, element) {
-            google.charts.setOnLoadCallback( () => drawChart( chart, element) );
+
+        onMovingAverageActiveChanged ( chart ) {
+            this.drawChartComuni(  chart.chart, chart.element );
+        },
+        onMovingAverageRangeChanged ( chart ) {
+            if ( chart.chart.movingAverage.active ) {
+                this.drawChartComuni( chart.chart, chart.element );
+            }
         },
     },
 
     watch: {
         selected () {
-            this.drawComuni();
             loadComuniFactory( this.dataUrl )()
                 .then( json => {
-                    this.json1 = json;
-                    this.decedutiChart.timeSeries = extractCumuneTimeSeries( this.json1, this.selected?.comune ).deceduti;
-                    this.drawChartComuni( this.decedutiChart, "deceduti1_comuni" );
+                    this.json = json;
+                    this.extractCumuneTimeSeries( this.json, this.selected?.comune );
+                    for ( const chart of this.charts ) {
+                        this.drawChartComuni( chart.chart, chart.element );
+                    }
                 } );
-        },
-        deceduti1Mva () {
-            this.decedutiChart.movingAverage.active = this.deceduti1Mva;
-            this.drawChartComuni( this.decedutiChart, "deceduti1_comuni" );
-         },
-        deceduti1Span () {
-            this.decedutiChart.movingAverage.range = parseInt( this.deceduti1Span );
-            if ( this.decedutiChart.movingAverage.active ) {
-                this.drawChartComuni( this.decedutiChart, "deceduti1_comuni" );
-            }
-        },
-        decedutiMva: { handler: 'drawComuni' },
-        decedutiSpan () {
-            if ( this.decedutiMva ) {
-                this.drawComuni();
-            }
-        },
-        guaritiMva: { handler: 'drawComuni' },
-        guaritiSpan () {
-            if ( this.guaritiMva ) {
-                this.drawComuni();
-            }
-        },
-        positiviMva: { handler: 'drawComuni' },
-        positiviSpan () {
-            if ( this.positiviMva ) {
-                this.drawComuni();
-            }
         },
         picked () {
             this.onSearch( "" )
@@ -248,9 +240,11 @@ var app = new Vue( {
     created () {
         loadComuniFactory( this.dataUrl )()
             .then( json => {
-                this.json1 = json;
-                this.decedutiChart.timeSeries = extractCumuneTimeSeries( this.json1, this.selected?.comune ).deceduti;
-                this.drawChartComuni( this.decedutiChart, "deceduti1_comuni" );
+                this.json = json;
+                this.extractCumuneTimeSeries( this.json, this.selected?.comune );
+                for ( const chart of this.charts ) {
+                    this.drawChartComuni( chart.chart, chart.element );
+                }
             } );
         fetch(
             this.dataUrl
@@ -261,7 +255,11 @@ var app = new Vue( {
                 this.selected = this.estraiOpzioni( json, "ROVERETO", this )[ 0 ];
                 this.options = this.estraiOpzioni( json, "", this );
             } );
-        this.drawComuni();
+        for ( const chart of this.charts ) {
+            this.$watch( () => chart.chart.movingAverage.active, () => this.onMovingAverageActiveChanged( chart ) );
+            this.$watch( () => chart.chart.movingAverage.range, () => this.onMovingAverageRangeChanged( chart ) );
+        }
+
     },
 
 } )
