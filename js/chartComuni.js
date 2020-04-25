@@ -97,9 +97,6 @@ var chartsComuni = new Vue( {
             let deadsList = [];
             let healedList = [];
             let before = 0;
-            let data = json[ json.length - 1 ].cov19_data;
-            //data = Array.from( data );
-            data.shift();
             let beforeDaily = 1;
             let deads = 0;
             let healed = 0;
@@ -107,7 +104,7 @@ var chartsComuni = new Vue( {
             let idx;
             for ( day of json ) {
                 date = new Date( day.date );
-                data = day.cov19_data;
+                let data = day.cov19_data;
                 //console.log(COMUNE,"Dati:",  data);
 
                 if ( data[ 0 ][ 0 ] === "Lat" ) {

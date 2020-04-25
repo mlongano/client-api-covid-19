@@ -105,7 +105,7 @@ var chartsTrentino = new Vue( {
             let ultimiTerapia = 0;
             let ultimiOspedalizzati = 0;
 
-            for ( daily of json ) {
+            for ( let daily of json ) {
                 date = new Date( daily.giorno.split( "/" ).reverse().join( "-" ) );
                 let nuovi_positivi = parseInt( daily.incremento );
                 let ratio = nuovi_positivi / beforeDaily;

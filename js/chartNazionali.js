@@ -115,7 +115,7 @@ var chartsNazionali = new Vue( {
             let ultimiTerapia = json[ 0 ].terapia_intensiva;
             let ultimiOspedalizzati = json[ 0 ].totale_ospedalizzati;
             let lastDateTime;
-            for ( daily of json ) {
+            for ( let daily of json ) {
                 lastDateTime = daily.data;
                 let date = daily.data.split( " " )[ 0 ];
                 last = new Date( date );
