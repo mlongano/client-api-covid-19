@@ -29,7 +29,9 @@
                     <h1 class="title display-1">Dati Nazionali</h1>
                     <p class="lead subtitle">Ultimo aggiornamento {{ lastDate }}</p>
                 </header>
-
+                <template>
+                  <gchart type="ColumnChart" :data="chartData" :options="chartOptions" />
+                </template>
                 <article class="charts hero-body">
                     <div v-for="(chart,index) in charts" :key="index">
                         <input type="checkbox" v-model="charts[index].chart.movingAverage.active">
@@ -118,6 +120,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/vue-async-computed"></script>
     <script src="https://unpkg.com/vue-select@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-google-charts@0.3.2/dist/vue-google-charts.browser.js"></script>
     <script src="https://unpkg.com/lodash@latest/lodash.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/app.js"></script>
